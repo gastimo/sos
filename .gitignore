@@ -1,0 +1,14 @@
+node_modules/
+dist/
+
+sos.nube/node_modules/
+sos.nube/dist/
+
+sos.siervo/node_modules/
+sos.siervo/dist/
+
+sos.presentalla/node_modules/
+sos.presentalla/dist/
+
+sos.mensajero/node_modules/
+sos.mensajero/dist/

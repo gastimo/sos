@@ -1,0 +1,31 @@
+{
+  "name": "sos.nube",
+  "version": "1.0.0",
+  "description": "Siervos del Obnubilante Scrolling (S.O.S.) - La Nube",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite --host --port 3330", 
+    "dev": "vite --host --port 3330", 
+    "build": "vite build", 
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "sos",
+    "antropobsceno",
+    "arrobamiento",
+    "nubel",
+    "obsceno",
+    "culto"
+  ],
+  "author": "Gastón Martino <mail@gastonmartino.xyz> (http://gastonmartino.xyz)",
+  "license": "UNLICENSED",
+  "homepage": "https://github.com/gastimo/sos#readme",
+  "dependencies": {
+    "node-osc": "^1.2.0",
+    "socket.io": "^1.7.4",
+    "three": "^0.178.0"
+  },
+  "devDependencies": {
+    "vite": "^7.0.4"
+  }
+}
