@@ -22,7 +22,7 @@
   "homepage": "https://github.com/gastimo/sos#readme",
   "dependencies": {
     "node-osc": "^1.2.0",
-    "socket.io": "^1.7.4",
+    "socket.io": "^1.7.4"
   },
   "devDependencies": {
     "vite": "^7.0.4"
