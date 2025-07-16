@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <title>El Siervo (S.O.S)</title>
+    <title>%VITE_PANTALLA_SIERVO_NOMBRE%</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" href="/src/estilos/sos.siervo.css">
   </head>
   <body>
 
-    <!-- MENSAJERO _OSC_elestial                                              -->
-    <!-- Intermediario (web socket) entre la nube y sus seguidores escuchando -->
-    <!-- en el puerto 8081 y responsable de recibir y canalizar los mensajes  -->
-    <!-- de los siervos hacia la nube a través del protocolo OSC.             -->
-    <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
-    <script src="http://192.168.0.9:8081/socket.io/socket.io.js"></script>
-    <script src="http://192.168.0.9:8091/socket.io/socket.io.js"></script>
+    <!-- MENSAJERO (OSC) DE LA PANTALLA-SIERVO                      -->
+    <!-- Intermediario (web socket) entre el siervo y las restantes -->
+    <!-- pantallas de la obra. Por un lado, se envían los mensajes  -->
+    <!-- de adoración hacia "La Nube" y, por otro lado, se envían   -->
+    <!-- las ofrendas digitales a la pantalla de la "Presentalla".  -->
+    <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
+    <script src="http://%VITE_CANAL_NUBE_SERVIDOR%:%VITE_CANAL_NUBE_PUERTO%/socket.io/socket.io.js"></script>
+    <script src="http://%VITE_CANAL_PRESENTALLA_SERVIDOR%:%VITE_CANAL_PRESENTALLA_PUERTO%/socket.io/socket.io.js"></script>
 
     <script>
-       var socket = io('http://192.168.0.9:8081');
+      // Canal de comunicación con "La Nube"
+      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv 
+       var socket = io('http://%VITE_CANAL_NUBE_SERVIDOR%:%VITE_CANAL_NUBE_PUERTO%');
        socket.on('connect', function() {
         socket.emit('config',
             {server: {port: 9998,
                      host: '127.0.0.1'
              },
-             client: {port: 3333,
-                     host: '192.168.0.9'
+             client: {port: %VITE_MENSAJERO_NUBE_PUERTO%,
+                     host: '%VITE_MENSAJERO_NUBE_SERVIDOR%'
               }
             }
         );});
@@ -33,15 +36,16 @@
         console.log(obj);
       });
 
-
-       var socket2 = io('http://192.168.0.9:8091');
+      // Canal de comunicación con "La Presentalla"
+      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+       var socket2 = io('http://%VITE_CANAL_PRESENTALLA_SERVIDOR%:%VITE_CANAL_PRESENTALLA_PUERTO%');
        socket2.on('connect', function() {
         socket2.emit('config',
             {server: {port: 9998,
                      host: '127.0.0.1'
              },
-             client: {port: 3334,
-                     host: '192.168.0.9'
+             client: {port: %VITE_MENSAJERO_PRESENTALLA_PUERTO%,
+                     host: '%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%'
               }
             }
         );});

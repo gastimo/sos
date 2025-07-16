@@ -4,8 +4,8 @@
   "description": "Siervos del Obnubilante Scrolling (S.O.S.) - El Siervo",
   "main": "index.js",
   "scripts": {
-    "start": "vite --host --port 3331", 
-    "dev": "vite --host --port 3331", 
+    "start"   : "vite --config vite.config.js", 
+    "dev"     : "vite --config vite.config.js", 
     "build": "vite build", 
     "preview": "vite preview"
   },

@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <title>La Presentalla (S.O.S)</title>
+    <title>%VITE_PANTALLA_PRESENTALLA_NOMBRE%</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" href="/src/estilos/sos.presentalla.css">
   </head>
   <body>
 
-    <!-- MENSAJERO _OSC_elestial                                              -->
-    <!-- Intermediario (web socket) entre la nube y sus seguidores escuchando -->
-    <!-- en el puerto 8081 y responsable de recibir y canalizar los mensajes  -->
-    <!-- de los siervos hacia la nube a través del protocolo OSC.             -->
-    <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
-    <script src="http://192.168.0.9:8091/socket.io/socket.io.js"></script>
-
+    <!-- MENSAJERO (OSC) DE LA PANTALLA-PRESENTALLA                -->
+    <!-- Intermediario (web socket) entre la presentalla (pantalla -->
+    <!-- de ofrendas) y los siervos, responsable de canalizar las  -->
+    <!-- ofrendas digitales de sus seguidores como mensajes OSC.   -->
+    <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
+    <script src="http://%VITE_CANAL_PRESENTALLA_SERVIDOR%:%VITE_CANAL_PRESENTALLA_PUERTO%/socket.io/socket.io.js"></script>
+    
     <script>
-       var socket = io('http://192.168.0.9:8091');
+       var socket = io('http://%VITE_CANAL_PRESENTALLA_SERVIDOR%:%VITE_CANAL_PRESENTALLA_PUERTO%');
        socket.on('connect', function() {
         socket.emit('config',
-            {server: {port: 3334,
-                     host: '192.168.0.9'
+            {server: {port: %VITE_MENSAJERO_PRESENTALLA_PUERTO%,
+                     host: '%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%'
              },
              client: {port: 9999,
                      host: '127.0.0.1'
@@ -33,7 +33,7 @@
       });
     </script>
       
-    <script type="module" src="/src/obra.js"></script>
+    <script type="module" src="/src/pantalla.js"></script>
         ¡El Ojo que todo lo ve!
   </body>
 </html>

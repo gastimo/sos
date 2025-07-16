@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <title>La Nube (S.O.S)</title>
+    <title>%VITE_PANTALLA_NUBE_NOMBRE%</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" href="/src/estilos/sos.nube.css">
   </head>
   <body>
 
-    <!-- MENSAJERO _OSC_elestial                                              -->
-    <!-- Intermediario (web socket) entre la nube y sus seguidores escuchando -->
-    <!-- en el puerto 8081 y responsable de recibir y canalizar los mensajes  -->
-    <!-- de los siervos hacia la nube a través del protocolo OSC.             -->
-    <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
-    <script src="http://192.168.0.9:8081/socket.io/socket.io.js"></script>
+    <!-- MENSAJERO (OSC) DE LA PANTALLA-NUBE                       -->
+    <!-- Intermediario (web socket) entre la nube y sus seguidores -->
+    <!-- responsable de recibir y canalizar los mensajes de los    -->
+    <!-- siervos hacia la nube a través del protocolo OSC.         -->
+    <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
+    <script src="http://%VITE_CANAL_NUBE_SERVIDOR%:%VITE_CANAL_NUBE_PUERTO%/socket.io/socket.io.js"></script>
 
     <script>
-       var socket = io('http://192.168.0.9:8081');
+       var socket = io('http://%VITE_CANAL_NUBE_SERVIDOR%:%VITE_CANAL_NUBE_PUERTO%');
        socket.on('connect', function() {
         socket.emit('config',
-            {server: {port: 3333,
-                     host: '192.168.0.9'
+            {server: {port: %VITE_MENSAJERO_NUBE_PUERTO%,
+                     host: '%VITE_MENSAJERO_NUBE_SERVIDOR%'
              },
              client: {port: 9999,
                      host: '127.0.0.1'
@@ -34,7 +34,7 @@
       });
     </script>
       
-    <script type="module" src="/src/obra.js"></script>
+    <script type="module" src="/src/pantalla.js"></script>
         ¡Seamos Todos Arrobados por la Nube!
   </body>
 </html>
