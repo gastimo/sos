@@ -10,8 +10,8 @@ export default defineConfig(({ mode }) => {
     },
     server: {
         open: true,
-        host: true,
-        port: env.VITE_PANTALLA_PRESENTALLA_PUERTO
+        host: env.VITE_PANTALLA_PRESENTALLA_SERVIDOR,
+        port: env.VITE_PANTALLA_PRESENTALLA_PUERTO_WEB
     },  
   };
 });

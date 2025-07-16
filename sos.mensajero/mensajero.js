@@ -1,14 +1,14 @@
 /* =============================================================================
  * 
- *                  M E N S A J E R O    _O S C_E L E S T I A L
+ *                            M E N S A J E R O S   
  * 
  * =============================================================================
  */
 
 /**
- * Mensajero _OSC_elestial
- * Intermediario (web socket) entre la nube y sus seguidores, escuchando
- * en el puerto 8081 y responsable de recibir y canalizar los mensajes
+ * Mensajero (OSC) de la "Pantalla-Nube"
+ * Intermediario (web socket) entre la nube y sus seguidores.
+ * Responsable de recibir y canalizar los mensajes de los 
  * de los siervos hacia la nube a través del protocolo OSC.
  */
 var osc = require('node-osc'),
@@ -38,6 +38,14 @@ io.on('connection', function (socket) {
   });
 });
 
+
+
+/**
+ * Mensajero (OSC) de la "Pantalla-Presentalla"
+ * Intermediario (web socket) entre la presentalla (pantalla
+ * de ofrendas) y los siervos. Responsable de canalizar las
+ * ofrendas digitales de sus seguidores como mensajes OSC.
+ */
 var osc1 = require('node-osc'),
     io1  = require('socket.io').listen(8091);
 var oscServer1, oscClient1;

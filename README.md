@@ -21,7 +21,7 @@ Según los "*Relatos apócrifos del Antropobsceno tardío*", en el principio exi
 
 
 # La Canalización Divina
-La comunicación inmediata entre las pantallas (páginas web) ocurre mediante el intercambio de mensajes OSC (*Open Sound Control*) basado, a su vez, en el protocolo UDP: *User Datagram Protocol*, y que tienen lugar gracias a la intervención mediadora de dos "*Web Sockets*" que permiten, por un lado, la interacción entre el seguidor/sievo y su objeto de veneración ("La Nube") y, por otro lado, la recaudación encubierta de los datos personales del celular como ofrendas digitales incondicionales.
+La comunicación inmediata entre las pantallas (páginas web) ocurre mediante el intercambio de mensajes OSC (*Open Sound Control*) basado, a su vez, en el protocolo UDP: *User Datagram Protocol*, y que tienen lugar gracias a la intervención mediadora de dos "*Web Sockets*" que permiten, por un lado, la interacción entre el seguidor/siervo y su objeto de veneración ("La Nube") y, por otro lado, la recaudación encubierta de los datos personales del celular como ofrendas digitales incondicionales.
 
 - **WEB SOCKET 1 - "La Veneración" (puerto 8081)**: responsable del vínculo directo entre "La Nube" y el seguidor/siervo, invitándolo a hacer *scroll* infinito en su pantalla como acto de obnubilación y arrobamiento celestial.
 - **WEB SOCKET 2 - "La Ofrenda" (puerto 8091)**: responsable de extraer, recolectar y analizar furtivamente los datos del celular del seguidor/siervo para procesarlos y presentarlos en la pantalla de la "Presentalla" como acto de renuncia y entrega divina.

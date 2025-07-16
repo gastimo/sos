@@ -10,8 +10,8 @@ export default defineConfig(({ mode }) => {
     },
     server: {
         open: true,
-        host: true,
-        port: env.VITE_PANTALLA_NUBE_PUERTO
+        host: env.VITE_PANTALLA_NUBE_SERVIDOR,
+        port: env.VITE_PANTALLA_NUBE_PUERTO_WEB
     },  
   };
 });
