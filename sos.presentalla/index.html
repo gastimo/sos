@@ -13,10 +13,10 @@
     <!-- de ofrendas) y los siervos, responsable de canalizar las  -->
     <!-- ofrendas digitales de sus seguidores como mensajes OSC.   -->
     <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
-    <script src="http://%VITE_MENSAJERO_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%/socket.io/socket.io.js"></script>
+    <script src="http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%/socket.io/socket.io.js"></script>
     
     <script>
-       var socket = io('http://%VITE_MENSAJERO_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%');
+       var socket = io('http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%');
        socket.on('connect', function() {
         socket.emit('config',
             {server: {port: %VITE_PANTALLA_PRESENTALLA_PUERTO_OSC%,

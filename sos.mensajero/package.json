@@ -2,9 +2,9 @@
   "name": "sos.mensajero",
   "version": "1.0.0",
   "description": "Siervos del Obnubilante Scrolling (S.O.S.) - El Mensajero",
-  "main": "index.js",
   "scripts": {
-    "start": "node mensajero.js"
+    "arrobamiento": "node mensajeria-arrobamiento.js",
+    "presentalla" : "node mensajeria-presentalla.js"
   },
   "keywords": [
     "sos",

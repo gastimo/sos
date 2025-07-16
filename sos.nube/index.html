@@ -13,10 +13,10 @@
     <!-- responsable de recibir y canalizar los mensajes de los    -->
     <!-- siervos hacia la nube a través del protocolo OSC.         -->
     <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
-    <script src="http://%VITE_MENSAJERO_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%/socket.io/socket.io.js"></script>
+    <script src="http://%VITE_MENSAJERO_NUBE_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%/socket.io/socket.io.js"></script>
 
     <script>
-       var socket = io('http://%VITE_MENSAJERO_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%');
+       var socket = io('http://%VITE_MENSAJERO_NUBE_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%');
        socket.on('connect', function() {
         socket.emit('config',
             {server: {port: %VITE_PANTALLA_NUBE_PUERTO_OSC%,

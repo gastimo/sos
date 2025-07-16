@@ -14,13 +14,13 @@
     <!-- de adoración hacia "La Nube" y, por otro lado, se envían   -->
     <!-- las ofrendas digitales a la pantalla de la "Presentalla".  -->
     <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
-    <script src="http://%VITE_MENSAJERO_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%/socket.io/socket.io.js"></script>
-    <script src="http://%VITE_MENSAJERO_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%/socket.io/socket.io.js"></script>
+    <script src="http://%VITE_MENSAJERO_NUBE_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%/socket.io/socket.io.js"></script>
+    <script src="http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%/socket.io/socket.io.js"></script>
 
     <script>
       // Canal de comunicación con "La Nube"
       // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv 
-       var socket = io('http://%VITE_MENSAJERO_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%');
+       var socket = io('http://%VITE_MENSAJERO_NUBE_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%');
        socket.on('connect', function() {
         socket.emit('config',
             {server: {port: 9998,
@@ -38,7 +38,7 @@
 
       // Canal de comunicación con "La Presentalla"
       // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-       var socket2 = io('http://%VITE_MENSAJERO_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%');
+       var socket2 = io('http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%');
        socket2.on('connect', function() {
         socket2.emit('config',
             {server: {port: 9998,
