@@ -10,7 +10,7 @@ Una breve ficción acerca del surgimiento del "Culto a la Obnubilación", plante
 # "La Obra"
 Según los "*Relatos apócrifos del Antropobsceno tardío*", en el principio existieron los "**Seguidores de la Orden del Silicio**" (S.O.S., por sus siglás en inglés), como una congregación de tecnoentusiastas de la región del *Silicon Valley* que abrazaron ciegamenete el poder divino de la tecnología como fuerza positiva propiciadora del progreso humano. Rápidamente pasaron de ser simples seguidores aficionados a convertirse en devotos fieles, al mismo tiempo que su optimismo inicial devino en un ferviente aceleracionismo que hizo resplandecer con mayor fuerza el aura sagrada de su tecnofanía. Las doctrinas tecnológicas se convirtieron en el canon global y la propia Orden fue renombrada como los “**Servidores de la Obra Solucionista**” (S.O.S), bajo la eufórica creencia de que era posible concebir al mundo en términos puramente computables. Es justo en este punto cuando la metáfora de “La Nube” deviene en dogma irrefutable, numen etéreo, objeto de fervorosa veneración y, al mismo tiempo, de obnubilación. **¡Seamos Todos Arrobados por la Nube!**
 
-![¡Seamos Todos Arrobados por la Nube](imagineria/SOS-seamos-arrobabos-por-la-nube.png)
+![¡Seamos Todos Arrobados por la Nube!](imagineria/SOS-seamos-arrobabos-por-la-nube.png)
 
 # Las Pantallas de la Obra
 "La Nube" es una **pantalla**: una metáfora infame ingeniada por el *Pensamiento Computacional* para encubrir una maquinaria colosal, pesada y contaminante detrás de una figura retórica celestial. El trabajo de "La Obra" es, justamente, una exaltación a la figura de la **pantalla** y a la obnubilación (obnubilar viene del latín *obnubilāre* y significa literalmente "tapar con la nube"). Tres pantallas distintas se enlanzan en una experiencia interactiva como parte del rito de adoración y el arrobamiento ante la figura de "La Nube".
@@ -19,12 +19,13 @@ Según los "*Relatos apócrifos del Antropobsceno tardío*", en el principio exi
 - **PANTALLA 2 - "El Siervo"**: pantalla táctil del celular de cada visitante, devenido en seguidor (y siervo) de "La Obra". Es una aplicación web para el móvil que, bajo la promesa de una recompensa inmediata, seduce al visitante a aventurarse en el acto del "*scroll* infinito" para entablar un vínculo de entrega y arrobamiento hacia "La Nube".
 - **PANTALLA 3 - "La Presentalla"**: pantalla digital encubierta de monitoreo y recolección de las ofrendas digitales que los propios siervos de "La Obra" entregan desinteresadamente (o involuntariamente) a "La Nube" como acto de sagrada renuncia.
 
-
 # La Canalización Divina
 La comunicación inmediata entre las pantallas (páginas web) ocurre mediante el intercambio de mensajes OSC (*Open Sound Control*) basado, a su vez, en el protocolo UDP (*User Datagram Protocol*) y que tienen lugar gracias a la intervención mediadora de dos "*Web Sockets*" que permiten, por un lado, la interacción entre el seguidor/siervo y su objeto de veneración ("La Nube") y, por otro lado, la recaudación encubierta de los datos personales del celular como ofrendas digitales incondicionales.
 
 - **WEB SOCKET 1 - "El Arrobamiento" (puerto 8081)**: responsable del vínculo directo entre "La Nube" y el seguidor/siervo, invitándolo a hacer "*scroll* infinito" en su pantalla como acto de obnubilación y arrobamiento celestial.
 - **WEB SOCKET 2 - "La Presentalla" (puerto 8091)**: responsable de extraer, recolectar y analizar furtivamente los datos del celular del seguidor/siervo (sus ofrendas digitales) para procesarlos y presentarlos en la pantalla de la "Presentalla" como evidencia del acto de renuncia y entrega divina.
+
+![Diagrama de "La Obra"](imagineria/SOS-la-obra.png)
 
 # Detalles de la Tecnofanía
 "La Obra" está constituida por cuatro módulos: tres pantallas y un módulo responsable de la conexión (mediante *web sockets*) y de la mensajería inter-pantalla (a través del protocolo OSC) que, por un lado, estimula el "arrobamiento" de los seguidores durante su veneración a "La Nube" y, por otro lado, encubre el acto de extracción sus "ofrendas digitales".
@@ -48,14 +49,13 @@ $ git clone https://github.com/gastimo/sos.git [nombre_carpeta]
 
 La instalación de los módulos requeridos para la ceremonia de "La Obra" puede tener lugar en un único equipo, en dos (recomendado) o, incluso, en tres, disponiendo los módulos según se explica en el diagrama a continuación:
 
-![¡Configuración de equipos para la instalación de "La Obra"](imagineria/SOS-configracion-equipos.png)
+![Configuración de equipos para la instalación de "La Obra"](imagineria/SOS-configracion-equipos.png)
 
-> **Nota 1**: Para la efectiva comunicación inter-pantalla es menester que, en caso de realizar una instalación en múltiples equipos, los conectores del **MÓDULO MENSAJERO** sean desboblados e instalados por separado según corresponda.
->
-> **Nota 2**: El módulo del "El Siervo" puede ser instalado e iniciado indistintamente en cualquiera de los equipos.
->
+- **OPCIÓN #1 (1 equipo)**: los cuatro módulos que conforman “La Obra” se instalan juntos en el mismo equipo que debería ser capaz de conectar dos pantallas diferentes: una para "La Nube" y otra para "La Presentalla".
+- **OPCIÓN #2 (2 equipos)**: los módulos se reparten en dos equipos separados: uno para el “Módulo Nube” y otro para el “Módulo Presentalla”. El “Módulo Siervo” puede instalarse en cualquier de los dos equipos indistintamente. El “Módulo Mensajero” se desdobla para instalar sus web sockets separadamente según corresponda. Cada uno de los equipos va conectado a una pantalla (una para "La Nube" y otra para "La Presentalla").
+- **OPCIÓN #3 (3 equipos)**: la instalación de los módulos se reparte en tres equipos diferentes: uno para el “Módulo Nube”, otro para el “Módulo Presentalla” y un tercero para el “Módulo Siervo”. El “Módulo Mensajero” se desdobla para instalar sus web sockets separadamente según corresponda. Tanto el equipo donde se instale el “Módulo Nube” como el del “Módulo Presentalla” deben permitir conectar una pantalla o proyector.
 
-Para instalar los paquetes y las dependencias de los módulos de "La Obra", moverse dentro de cada subcarpeta y ejecutar el comando `npm i` en cada una de ellas. En caso de realizar una instalación en múltiples equipos, sólo es necesario instalar en cada uno de ellos los módulos que se vayan a utilizar.
+Para instalar los paquetes y las dependencias de los módulos de "La Obra", moverse dentro de cada subcarpeta y ejecutar el comando `npm i` en cada una de ellas. En caso de realizar una instalación en múltiples equipos, sólo es necesario instalar en cada uno de ellos los módulos que se vayan a utilizar únicamente.
 ```sh
 $ cd [nombre_carpeta]
 $ cd sos.nube
@@ -70,7 +70,7 @@ $ cd ..
 ```
 
 ## Iniciación de "La Obra"
-Para levantar todos los servicios y que el ritual de "La Obra" quede en funcionamiento, se utiliza el comando `npm start` ejecutado dentro de las subcarpetas de cada módulo y teniendo en cuenta la configuracióń de los equipos realizada. A continuación se ilustra la manera de iniciar "La Obra" para una configuración en dos equipos.
+Para levantar todos los servicios y que el ritual de "La Obra" quede en funcionamiento, se utilizan comandos `npm` ejecutados dentro de las subcarpetas de cada módulo y teniendo en cuenta la configuracióń de los equipos realizada. A continuación, y a modo de ejemplo, se ilustra la manera de iniciar "La Obra" para una configuración en dos equipos.
 
 ### Iniciación de los Componentes en el "Equipo #1"
 ```sh
@@ -82,7 +82,7 @@ $ cd ../sos.siervo
 $ npm start
 $ cd ..
 ```
-
+ 
 ### Iniciación de los Componentes en el "Equipo #2"
 ```sh
 $ cd sos.mensajero
@@ -91,8 +91,7 @@ $ cd ../sos.presentalla
 $ npm start
 $ cd ..
 ```
-
-> **Nota**: en cada una de las computadoras es importante que el **MÓDULO MENSAJERO** sea iniciado siempre en primer lugar, antes que los módulos de las pantallas correspondientes.
->
+> **Nota**: en necesario iniciar siempre el MÓDULO MENSAJERO que inicializa los *web sockets* en cada equipo antes de iniciar los módulos de las pantallas correspondientes.
 
 
+![¡Seamos Todos Arrobados por la Nube!](imagineria/SOS-nube-separador.png)
