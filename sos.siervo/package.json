@@ -2,7 +2,6 @@
   "name": "sos.siervo",
   "version": "1.0.0",
   "description": "Siervos del Obnubilante Scrolling (S.O.S.) - El Siervo",
-  "main": "index.js",
   "scripts": {
     "start"   : "vite --config vite.config.js", 
     "dev"     : "vite --config vite.config.js", 
@@ -13,7 +12,7 @@
     "sos",
     "antropobsceno",
     "arrobamiento",
-    "nubel",
+    "nube",
     "obsceno",
     "culto"
   ],

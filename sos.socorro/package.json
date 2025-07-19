@@ -1,0 +1,24 @@
+{
+  "name": "socorro",
+  "version": "0.0.1",
+  "description": "Siervos de la Obra del Socorro (S.O.S)",
+  "main": "./dist/index.js",
+  "scripts": {
+  },
+  "keywords": [
+    "sos",
+    "socorro",
+    "socorrista",
+    "siervo",
+    "obra",
+    "shader",
+    "p5js",
+    "glsl"
+  ],
+  "author": "Gastón Martino <mail@gastonmartino.xyz> (http://gastonmartino.xyz)",
+  "license": "UNLICENSED",
+  "homepage": "https://github.com/gastimo/socorro#readme",
+  "devDependencies": {
+    "three": "^0.177.0"
+  }
+}

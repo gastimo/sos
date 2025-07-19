@@ -1,3 +1,4 @@
+sos.test/
 node_modules/
 dist/
 
@@ -12,3 +13,9 @@ sos.presentalla/dist/
 
 sos.mensajero/node_modules/
 sos.mensajero/dist/
+
+sos.socorro/node_modules/
+sos.socorro/dist/
+sos.socorro/.gitignore
+sos.socorro/.npmignore
+sos.socorro/README.md
