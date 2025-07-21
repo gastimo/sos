@@ -7,7 +7,6 @@
  */
 import CONFIG from './config';
 import Esquema from './esquema';
-import * as THREE from 'three';
 
 
 /**
@@ -42,9 +41,10 @@ function Escena(sos) {
     let _nombreUniformMouse      = CONFIG.UNIFORM_MOUSE;
 
     // Variables Three.js
-    var camera, scene, renderer;
+    let camera, scene;
+    let rendererTHREE;
+    let rendererP5;
     
-
     
 // =====================================================================
 // 
@@ -84,7 +84,7 @@ function Escena(sos) {
          * y se encarga de desplegar la escena (cuadro a cuadro).
          */
         _FUNCION[CONFIG.ACTO_EJECUCION] = () => {
-            renderer.render(scene, camera);
+            rendererTHREE.render(scene, camera);
         };
         
         return _FUNCION;
@@ -130,7 +130,7 @@ function Escena(sos) {
     function uniformResolucion(nombre) {
         if (nombre !== undefined) {
             _nombreUniformResolucion = nombre;
-            uniform(nombre, new THREE.Vector2());
+            uniform(nombre, new S.O.S.THREE.Vector2());
         }
         return uniform(nombre);
     }
@@ -138,12 +138,18 @@ function Escena(sos) {
     function uniformMouse(nombre) {
         if (nombre !== undefined) {
             _nombreUniformMouse = nombre;
-            uniform(nombre, new THREE.Vector2());
+            uniform(nombre, new S.O.S.THREE.Vector2());
         }
         return uniform(nombre);
     }
     
-    function uniform(nombre, valor) {
+    function uniform(nombre, valor, valor2) {
+        if (valor2 !== undefined) {
+            let v = new S.O.S.THREE.Vector2();
+            v.x = valor;
+            v.y = valor2;
+            return uniform(nombre, v);
+        }
         if (valor !== undefined) {
             if (!_uniforms.hasOwnProperty(nombre))
                 _uniforms[nombre] = {};
@@ -171,42 +177,56 @@ function Escena(sos) {
      * representa la escena (el canvas del renderer).
      */
     function dimensionar(ancho, alto) {
-        if (renderer) {
-            renderer.setSize(ancho, alto); 
+        if (rendererTHREE) {
+            rendererTHREE.setSize(ancho, alto); 
+        }
+        if (rendererP5) {
+            S.O.S.P5.resizeCanvas(ancho, alto);
+            S.O.S.P5.ortho(-ancho / 2, ancho / 2, -alto / 2, alto / 2);             
         }
     }
     
     /**
      * emplazar
-     * Función principal que encapsula la mayoría de los
-     * llamados a las librerías Three.js. El emplazamiento
-     * tiene lugar una vez que finalizaron los 2 primeros
-     * actos y justo antes de iniciar el bucle de ejecución.
-     * Es en este momento cuando se crea el canvas, se
-     * recalculan sus dimensiones y se coloca en la página.
-     * También es la oportunidad para realizar cualquier 
-     * tipo de validación antes de arrancar con el "render".
+     * Función principal que encapsula los llamados a las librerías necesarias
+     * para construir el "canvas" de la escena en la página HTML.
+     * El emplazamiento tiene lugar una vez que finalizaron los 2 primeros actos 
+     * y justo antes de iniciar el bucle de ejecución.
      */
     function emplazar(contenedor) {
         _contenedor = contenedor;
+        if (!S.O.S.P5) {
+            _emplazarLienzoTHREE();
+        }
+        else {
+            _emplazarLienzoP5();
+        }
+    }
         
+
+    /**
+     * _emplazarLienzoTHREE
+     * Realiza el emplazamiento del "canvas" únicamente a través de la
+     * librería Three.js
+     */
+    function _emplazarLienzoTHREE() {        
         // 1. CREACIÓN DEL LIENZO (CANVAS)
         // La creación del lienzo o canvas es diferida hasta el momento del 
         // emplazamiento de la escena en la página. Se supone que en este 
         // punto el contenedor (elemento HTML) ya fue creado y sus dimensiones
         // fueron ajustadas por el navegador en función del tamaño del viewport.
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-        renderer = new THREE.WebGLRenderer();
-        renderer.setPixelRatio(window.devicePixelRatio);
-        _contenedor.lienzo(renderer.domElement);
+        rendererTHREE = new S.O.S.THREE.WebGLRenderer();
+        rendererTHREE.setPixelRatio(window.devicePixelRatio);
+        _contenedor.lienzo(rendererTHREE.domElement);
 
         
         // 2. CREACIÓN DE VERDADERA ESCENA
         // Una vez que el lienzo fue creado y emplazado en la página, se procede
         // con la creación de la escena mediante la libreraí Three.js
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-        scene = new THREE.Scene();
-        camera = new THREE.Camera();
+        scene = new S.O.S.THREE.Scene();
+        camera = new S.O.S.THREE.Camera();
         camera.position.z = 1;
 
         
@@ -221,13 +241,23 @@ function Escena(sos) {
             vertexShader    : _vshader,
             fragmentShader  : _fragmentShader.contenido(),
         };
-        let material = new THREE.ShaderMaterial(atributos);
-        let geometry = new THREE.PlaneGeometry( 2, 2 );
-        let mesh = new THREE.Mesh( geometry, material );
+        let material = new S.O.S.THREE.ShaderMaterial(atributos);
+        let geometry = new S.O.S.THREE.PlaneGeometry( 2, 2 );
+        let mesh = new S.O.S.THREE.Mesh( geometry, material );
         scene.add( mesh );
     }
         
 
+    /**
+     * _emplazarLienzoP5
+     * Realiza el emplazamiento del "canvas" únicamente a través de la
+     * librería p5js
+     */
+    function _emplazarLienzoP5() {
+        rendererP5 = S.O.S.P5.createCanvas(_contenedor.geometria.ancho, _contenedor.geometria.alto, S.O.S.P5.WEBGL);
+        _contenedor.lienzo(rendererP5.canvas);   
+    }
+    
     
 // =====================================================================
 // 
@@ -244,6 +274,12 @@ function Escena(sos) {
     function inicializar() {
     }
     
+    function vincular(three, p5) {
+        S.O.S.THREE = three;
+        S.O.S.P5    = p5;
+    }
+
+    
     
     // ===============================================================
     // ===> Se exponen únicamente las funciones públicas de la escena
@@ -257,6 +293,7 @@ function Escena(sos) {
                          uniform,
                          dimensionar,
                          emplazar,
+                         vincular,
                          inicializar
                          }, 
                          functionActuaria(),                     // Se adicionan los métodos de la "Función Actuaria"

@@ -8,6 +8,8 @@ import CONFIG from './config';
 import Contenedor from './contenedor.js';
 import Orquestador from './orquestador.js';
 import Escena from './escena.js';
+import * as THREE from 'three';
+import p5 from 'p5';
 
 
 /**
@@ -51,10 +53,10 @@ const Obra = (() => {
      * propio orquestador (asignado durante la creación) que 
      * determina cuándo/cómo cargarla, comenzarla y desplegarla.
      */
-    function orquestar(orquestador) {
-        // Si el orquestador es "Processing" (p5js) se
-        // delega la orquestación en esta librería.
-        if (orquestador.processing()) {
+    function orquestar(orquestador, usarP5) {
+        // Si el orquestador es "Processing" (p5js), entonces parte
+        // de la orquestación se le delega a esta librería.
+        if (usarP5) {
             new p5(orquestador.funcionActuaria());
         }
         
@@ -115,7 +117,7 @@ const Siervo = () => {
     function socorrista(sketch) {
         const _S = Obra.seguidor(Siervo());
         if (sketch) {
-            _S.O.S.p5 = sketch;
+            _S.O.S.p5js = sketch;
         }
         return _S;
     }
@@ -169,14 +171,31 @@ const Siervo = () => {
     
     /**
      * crearEscena
-     * Realiza una puesta en escena desde cero para la Obra.
-     * Dependiendo del tipo de escena, pueden ser requeridas
-     * las funciones de la librería Three.js o de p5js.
-     * En lugar de retornar una "escena", esta función devuelve
-     * on "escenificador" que es un intermediario para poder
-     * configurar y manipular las propiedades de la escena.
+     * Realiza una puesta en escena desde cero para la Obra utilizando Three.js.
+     * En lugar de retornar una "escena", esta función devuelve un "escenificador"
+     * que es un objeto intermediario para configurar y manipular la escena.
      */
     function crearEscena(contenedor, guardarProporciones = false, ancho = 0, alto = 0) {
+        return _crearEscena(contenedor, guardarProporciones, ancho, alto, false);
+    }
+
+    /**
+     * crearEscenaP5
+     * Realiza una puesta en escena desde cero para la Obra utilizando p5js.
+     * En lugar de retornar una "escena", esta función devuelve un "escenificador"
+     * que es un objeto intermediario para configurar y manipular la escena.
+     */
+    function crearEscenaP5(contenedor, guardarProporciones = false, ancho = 0, alto = 0) {
+        return _crearEscena(contenedor, guardarProporciones, ancho, alto, true);
+    }
+    
+    /**
+     * _crearEscena
+     * Función privada que se ocupa de la creación de la escena ya sea mediante
+     * el uso de la librería Three.js o de p5js. El objeto retornado por la función
+     * es un "escenificador" desde el cual se puede manipular la escena creada.
+     */
+    function _crearEscena(contenedor, guardarProporciones = false, ancho = 0, alto = 0, usarP5 = false) {
         let _indice = _contador++;
         const _contenedor = Contenedor(contenedor, guardarProporciones, ancho, alto);
         
@@ -216,7 +235,7 @@ const Siervo = () => {
             // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
             FUNCION[CONFIG.ACTO_PREPARACION] = () => {
                 _escenas[_indice] = Escena(S.O.S);
-                _orquestador.vincular(_escenas[_indice]);
+                _orquestador.vincular(_escenas[_indice], THREE, usarP5 ? FUNCION : null);
                 const _ACTO1 = _escenificadorCarga ? _escenificadorCarga(_orquestador.socorrista()): 
                                                    _escenas[_indice][CONFIG.ACTO_PREPARACION]();
             };
@@ -229,7 +248,12 @@ const Siervo = () => {
                 const _ACTO2 = _escenificadorComienzo ? _escenificadorComienzo(_orquestador.socorrista()) : 
                                                       _escenas[_indice][CONFIG.ACTO_INICIACION]();
                 _escenas[_indice].emplazar(_contenedor);
+                _orquestador.verificacionPosActo2();
             };
+            FUNCION.setup = () => {                    // Redefinición para p5js
+                FUNCION[CONFIG.ACTO_PREPARACION]();    // El "preload" se eliminó en la v2.0
+                FUNCION[CONFIG.ACTO_INICIACION]();
+            };  
             
             // 3. ACTO DE EJECUCIÓN (o método "draw" de p5js)
             // Se trata de una función recurrente que dibuja la
@@ -237,14 +261,18 @@ const Siervo = () => {
             // varias veces por segundo en un bucle infinito.
             // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
             FUNCION[CONFIG.ACTO_EJECUCION] = () => {
-                const _ACTO3 = _escenificadorDespliegue ? _escenificadorDespliegue(_orquestador.socorrista()) : 
-                                                        _escenas[_indice][CONFIG.ACTO_EJECUCION]();
+                if (_orquestador.bucleIniciado()) {                    
+                    _orquestador.verificacionPreActo3();
+                    const _ACTO3 = _escenificadorDespliegue ? _escenificadorDespliegue(_orquestador.socorrista()) : 
+                                                            _escenas[_indice][CONFIG.ACTO_EJECUCION]();
+                }
             };
+            FUNCION.draw = FUNCION[CONFIG.ACTO_EJECUCION];  // Redefinición para p5js
         });
             
         // Se añade el nuevo orquestador a la Obra y se devuelve el escenificador
         // para asistir, desde afuera, en el montaje de los actos de la obra.
-        Obra.orquestar(_orquestador);        
+        Obra.orquestar(_orquestador, usarP5);        
         return _escenificador;
     }
     
@@ -257,6 +285,7 @@ const Siervo = () => {
             obtenerClave,
             revelar,
             crearEscena,
+            crearEscenaP5,
             Contenedor
           };
 };

@@ -22,5 +22,9 @@ export default defineConfig(({ mode }) => {
       __PANTALLA_ANCHO__    : 1920,
       __PANTALLA_ALTO__     : 1080
     },
+    
+    optimizeDeps: {
+      needsInterop: ['socorro'],
+    },
   };
 });

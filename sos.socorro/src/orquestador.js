@@ -6,7 +6,7 @@
  * =============================================================================
  */
 import CONFIG from './config';
-import * as THREE from 'three';
+
 
 /**
  * Orquestador
@@ -28,10 +28,10 @@ import * as THREE from 'three';
  * Si se indica el uso de la librería de "Processing" (p5js)
  * se le delega, entonces, la orquestación a ésta.
  */
-function Orquestador(sos, contenedor, p5js = false) {
+function Orquestador(sos, contenedor) {
     const S = sos.socorrista();
-    const _processing = p5js;
-    let   _reloj = new THREE.Clock();
+    let   _processing = false;
+    let   _reloj; 
     let   _funcionActuaria;
     let   _contenedor = contenedor;
     let   _escena;
@@ -93,8 +93,8 @@ function Orquestador(sos, contenedor, p5js = false) {
     function Cargador() {
         const _shaders = [];
         const _texturas = [];
-        const _gestorDeCarga = new THREE.LoadingManager();
-        const _cargador = new THREE.TextureLoader(_gestorDeCarga);
+        const _gestorDeCarga = new S.O.S.THREE.LoadingManager();
+        const _cargador = new S.O.S.THREE.TextureLoader(_gestorDeCarga);
         let   _texturasCargadas = false;
         _gestorDeCarga.onLoad = () => {
             _texturasCargadas = true;
@@ -149,8 +149,13 @@ function Orquestador(sos, contenedor, p5js = false) {
      * al momento de la creación del orquestador, la información
      * necesaria para convertirlo en el socorrista designado.
      */
-    function vincular(escena) {
+    function vincular(escena, three, p5) {
+        S.O.S.THREE = three;
+        S.O.S.P5    = p5;
         _escena = escena;
+        _escena.vincular(three, p5);
+        _processing = p5 ? true : false;
+        _reloj = new S.O.S.THREE.Clock();
         S.O.S.revelar(S.O.S, Cargador(), escena);
     }    
     
@@ -186,15 +191,6 @@ function Orquestador(sos, contenedor, p5js = false) {
             }
         }
         return _funcionActuaria;
-    }
-    
-    /**
-     * processing
-     * Indica si se debe utilizar la librería de "Processing"
-     * (p5js) para la orquestación.
-     */
-    function processing() {
-        return _processing;
     }
     
     
@@ -233,7 +229,6 @@ function Orquestador(sos, contenedor, p5js = false) {
                 if ((!_funcionPreparacion && !_funcionIniciacion) || 
                     (_funcionPreparacion && _actoPreparacionFinalizado && !_funcionIniciacion) ||
                     _actoIniciacionIniciado) {
-                    _orquestarPreActo3();
                     _orquestarActo3();
                     _actoEjecucionIniciado = true;
                     return;
@@ -247,7 +242,9 @@ function Orquestador(sos, contenedor, p5js = false) {
      * Función orquestadora del acto #1: "Preparación"
      */
     function _orquestarActo1() {
-        _funcionPreparacion();
+        if (!_processing) {
+            _funcionPreparacion();
+        }
     }
     
     /**
@@ -255,15 +252,28 @@ function Orquestador(sos, contenedor, p5js = false) {
      * Función orquestadora del acto #2: "Iniciación"
      */
     function _orquestarActo2() {
-        _funcionIniciacion();
+        if (!_processing) {
+            _funcionIniciacion();
+        }
     }
     
     /**
-     * _orquestarPreActo3
+     * _orquestarActo3
+     * Función orquestadora del acto #3: "Ejecución"
+     */
+    function _orquestarActo3() {
+        if (!_processing) {
+            _funcionEjecucion();
+        }
+    }
+        
+
+    /**
+     * verificacionPosActo2
      * Función ejecutar las verificaciones y configuraciones
      * finales antes de dar inicio al bucle de reproducción.
      */
-    function _orquestarPreActo3() {
+    function verificacionPosActo2() {
         // Verificación de "uniform" para el tiempo
         _valorUniformTiempo = _escena.uniformTiempo();
         if (_valorUniformTiempo === undefined) {
@@ -291,10 +301,11 @@ function Orquestador(sos, contenedor, p5js = false) {
     }
 
     /**
-     * _orquestarActo3
-     * Función orquestadora del acto #3: "Ejecución"
+     * verificacionPreActo3
+     * Función actualiza el contexto de ejecución en cada iteración
+     * del bucle, justo antes de ejecutar el "Acto 3".
      */
-    function _orquestarActo3() {
+    function verificacionPreActo3() {
         // Primero, se verifica si cambiaron las dimensiones del contenedor
         if (_contenedor.actualizar()) {
             // Se actualizan las dimensiones de la escena
@@ -304,12 +315,26 @@ function Orquestador(sos, contenedor, p5js = false) {
             _valorUniformResolucion[CONFIG.UNIFORM_VALOR].x = _contenedor.geometria.ancho;
             _valorUniformResolucion[CONFIG.UNIFORM_VALOR].y = _contenedor.geometria.alto;
         }
-        
-        // Luego, se actualiza el "uniform" para el tiempo
+        // Se actualiza el "uniform" para el tiempo
         _valorUniformTiempo[CONFIG.UNIFORM_VALOR] += _reloj.getDelta();
-
-        // Finalmente se realiza la ejecución del "Acto 3"
-        _funcionEjecucion();
+    }
+    
+    /**
+     * bucleIniciado
+     * Indica si ya se ha dado comienzo al bucle eterno 
+     * del "Acto 3" de la obra.
+     */
+    function bucleIniciado() {
+        return _actoEjecucionIniciado;
+    }
+    
+    /**
+     * processing
+     * Indica si se debe utilizar la librería de "Processing"
+     * (p5js) para la orquestación.
+     */
+    function processing() {
+        return _processing;
     }
     
     
@@ -321,7 +346,10 @@ function Orquestador(sos, contenedor, p5js = false) {
             vincular,
             socorrista,
             funcionActuaria, 
-            orquestar, 
+            orquestar,
+            verificacionPosActo2,
+            verificacionPreActo3,
+            bucleIniciado,
             processing
            };
 }
