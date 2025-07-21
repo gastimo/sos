@@ -53,14 +53,8 @@ const Obra = (() => {
      * propio orquestador (asignado durante la creación) que 
      * determina cuándo/cómo cargarla, comenzarla y desplegarla.
      */
-    function orquestar(orquestador, usarP5) {
-        // Si el orquestador es "Processing" (p5js), entonces parte
-        // de la orquestación se le delega a esta librería.
-        if (usarP5) {
-            new p5(orquestador.funcionActuaria());
-        }
-        
-        // Sino, simplemente se encola el orquestador para
+    function orquestar(orquestador) {
+        // Simplemente se encola el orquestador para
         // convocarlo, luego, en cada iteración del bucle.
         _orquestadores.push(orquestador);
     }
@@ -225,7 +219,8 @@ const Siervo = () => {
         // (el "Ciclo Eterno de la Representación").
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         const _orquestador = Orquestador(S.O.S, _contenedor);
-        _orquestador.funcionActuaria(   // ==> La "Función Actuaria" define 3 actos
+        _orquestador.asociar('THREE', THREE);
+        _orquestador.funcionActuaria(
           (FUNCION) => {
             
             // 1. ACTO DE PREPARACIÓN (o método "preload" de p5js)
@@ -235,7 +230,7 @@ const Siervo = () => {
             // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
             FUNCION[CONFIG.ACTO_PREPARACION] = () => {
                 _escenas[_indice] = Escena(S.O.S);
-                _orquestador.vincular(_escenas[_indice], THREE, usarP5 ? FUNCION : null);
+                _orquestador.vincular(_escenas[_indice]);
                 const _ACTO1 = _escenificadorCarga ? _escenificadorCarga(_orquestador.socorrista()): 
                                                    _escenas[_indice][CONFIG.ACTO_PREPARACION]();
             };
@@ -245,13 +240,20 @@ const Siervo = () => {
             // El "canvas" es creado e inicializado en este momento.
             // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
             FUNCION[CONFIG.ACTO_INICIACION] = () => {
-                const _ACTO2 = _escenificadorComienzo ? _escenificadorComienzo(_orquestador.socorrista()) : 
-                                                      _escenas[_indice][CONFIG.ACTO_INICIACION]();
-                _escenas[_indice].emplazar(_contenedor);
-                _orquestador.verificacionPosActo2();
+                if (_orquestador.acto2ListoParaIniciar()) { 
+                    const _ACTO2 = _escenificadorComienzo ? _escenificadorComienzo(_orquestador.socorrista()) : 
+                                                          _escenas[_indice][CONFIG.ACTO_INICIACION]();
+                    _escenas[_indice].emplazar(_contenedor);
+                    _orquestador.verificacionPosActo2();
+                    _orquestador.diferido(false);
+                }
+                else {
+                    _orquestador.diferido(true);
+                }
             };
-            FUNCION.setup = () => {                    // Redefinición para p5js
-                FUNCION[CONFIG.ACTO_PREPARACION]();    // El "preload" se eliminó en la v2.0
+            // Redefinición de funciones para el SETUP de psjs
+            FUNCION.setup = () => {   
+                FUNCION[CONFIG.ACTO_PREPARACION]();  // El "preload" se eliminó en la v2.0
                 FUNCION[CONFIG.ACTO_INICIACION]();
             };  
             
@@ -261,18 +263,28 @@ const Siervo = () => {
             // varias veces por segundo en un bucle infinito.
             // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
             FUNCION[CONFIG.ACTO_EJECUCION] = () => {
-                if (_orquestador.bucleIniciado()) {                    
+                if (_orquestador.acto3ListoParaIniciar()) {                    
                     _orquestador.verificacionPreActo3();
                     const _ACTO3 = _escenificadorDespliegue ? _escenificadorDespliegue(_orquestador.socorrista()) : 
                                                             _escenas[_indice][CONFIG.ACTO_EJECUCION]();
                 }
             };
-            FUNCION.draw = FUNCION[CONFIG.ACTO_EJECUCION];  // Redefinición para p5js
+            // Redefinición de funciones para el DRAW de p5js
+            FUNCION.draw = () => {
+                if (_orquestador.diferido())
+                    FUNCION[CONFIG.ACTO_INICIACION]();
+                FUNCION[CONFIG.ACTO_EJECUCION](); 
+            };
         });
             
-        // Se añade el nuevo orquestador a la Obra y se devuelve el escenificador
-        // para asistir, desde afuera, en el montaje de los actos de la obra.
-        Obra.orquestar(_orquestador, usarP5);        
+        // INICIO DE LA ORQUESTACIÓN
+        // Se añade el orquestador a "La Obra" para dar inicio a la función
+        // Se inicia también la instancia de p5js en caso de ser necesario.
+        // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+        if (usarP5) {
+            _orquestador.asociar('P5', new p5(_orquestador.funcionActuaria()));
+        }
+        Obra.orquestar(_orquestador);        
         return _escenificador;
     }
     

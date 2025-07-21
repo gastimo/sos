@@ -33,6 +33,7 @@ function Escena(sos) {
 
     // Shaders
     let _vertexShader, _fragmentShader;
+    let _p5Shader;
     
     // Definición e inicialización de variables "uniform"
     const _uniforms = {};
@@ -84,7 +85,15 @@ function Escena(sos) {
          * y se encarga de desplegar la escena (cuadro a cuadro).
          */
         _FUNCION[CONFIG.ACTO_EJECUCION] = () => {
-            rendererTHREE.render(scene, camera);
+            if (rendererTHREE) {
+                rendererTHREE.render(scene, camera);
+            }
+            if (rendererP5) {
+                S.O.S.P5.push();
+                S.O.S.P5.noStroke();
+                S.O.S.P5.plane(_contenedor.geometria.ancho, _contenedor.geometria.alto);
+                S.O.S.P5.pop();           
+            }
         };
         
         return _FUNCION;
@@ -145,15 +154,14 @@ function Escena(sos) {
     
     function uniform(nombre, valor, valor2) {
         if (valor2 !== undefined) {
-            let v = new S.O.S.THREE.Vector2();
-            v.x = valor;
-            v.y = valor2;
+            let v = new S.O.S.THREE.Vector2(valor, valor2);
             return uniform(nombre, v);
         }
         if (valor !== undefined) {
             if (!_uniforms.hasOwnProperty(nombre))
                 _uniforms[nombre] = {};
             _uniforms[nombre][CONFIG.UNIFORM_VALOR] = valor;
+            uniformP5(nombre, valor);
         }
         else {
             if (!_uniforms.hasOwnProperty(nombre) || !_uniforms[nombre].hasOwnProperty(CONFIG.UNIFORM_VALOR)) {
@@ -163,6 +171,36 @@ function Escena(sos) {
         return _uniforms[nombre];
     }
 
+    function uniformP5(nombre, valor) {
+        if (valor !== null && _p5Shader) {
+            if (typeof valor === 'object' && !Array.isArray(valor)) {
+                if (valor.hasOwnProperty('x') && valor.hasOwnProperty('y') && valor.hasOwnProperty('z')) {
+                    _p5Shader.setUniform(nombre, [valor.x, valor.y, valor.z]);
+                }
+                else if (valor.hasOwnProperty('x') && valor.hasOwnProperty('y')) {
+                    _p5Shader.setUniform(nombre, [valor.x, valor.y]);
+                }
+                else {
+                    _p5Shader.setUniform(nombre, valor);
+                }
+            }
+            else {
+                _p5Shader.setUniform(nombre, valor);
+            }
+        }
+    }
+    
+    function uniformTiempoP5(valor) {
+        uniformP5(_nombreUniformTiempo, valor);
+    }
+    
+    function uniformResolucionP5(valor) {
+        uniformP5(_nombreUniformResolucion, valor);
+    }
+    
+    function uniformMouseP5(valor) {
+        uniformP5(_nombreUniformMouse, valor);
+    }
     
 
 // =====================================================================
@@ -235,7 +273,7 @@ function Escena(sos) {
         // definen las variables "uniform" y se invocan las funciones de la
         // librería Three.js para ejecutar los "shaders" de la escena.
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-        let _vshader = _vertexShader && _vertexShader.contenido() ? _vertexShader.contenido() : CONFIG.VERTEX_SHADER;
+        let _vshader = _vertexShader && _vertexShader.contenido() ? _vertexShader.contenido() : CONFIG.VERTEX_SHADER_THREE;
         let atributos = {
             uniforms        : _uniforms,
             vertexShader    : _vshader,
@@ -255,7 +293,23 @@ function Escena(sos) {
      */
     function _emplazarLienzoP5() {
         rendererP5 = S.O.S.P5.createCanvas(_contenedor.geometria.ancho, _contenedor.geometria.alto, S.O.S.P5.WEBGL);
-        _contenedor.lienzo(rendererP5.canvas);   
+        _contenedor.lienzo(rendererP5.canvas);  
+        
+        // Se verifica si se indicó algún shader
+        if ((_vertexShader && _vertexShader.contenido()) ||
+            (_fragmentShader && _fragmentShader.contenido())) {
+            let _vshader = _vertexShader && _vertexShader.contenido() ? _vertexShader.contenido() : CONFIG.VERTEX_SHADER_P5;
+            _p5Shader = S.O.S.P5.createShader(_vshader, _fragmentShader.contenido());
+            S.O.S.P5.shader(_p5Shader);
+            
+            // Se definen los valores iniciales de los "uniforms"
+            // que hayan sido creados hasta el momento.
+            for (const [uNombre, uValor] of Object.entries(_uniforms)) {
+                if (uValor.hasOwnProperty(CONFIG.UNIFORM_VALOR)) {
+                    uniformP5(uNombre, uValor[CONFIG.UNIFORM_VALOR]);
+                }
+            }
+        }
     }
     
     
@@ -274,11 +328,21 @@ function Escena(sos) {
     function inicializar() {
     }
     
-    function vincular(three, p5) {
-        S.O.S.THREE = three;
-        S.O.S.P5    = p5;
-    }
-
+    /**
+     * asociar
+     * Asocia componentes como parte del socorrista designado.
+     */
+    function asociar(nombre, componente) {
+        if (nombre == 'THREE') {
+            S.O.S.THREE = componente;
+        }
+        else if (nombre == 'P5') {
+            S.O.S.P5 = componente;
+        }
+        else {
+            S.O.S[nombre] = componente;
+        }
+    }    
     
     
     // ===============================================================
@@ -291,9 +355,13 @@ function Escena(sos) {
                          uniformResolucion,
                          uniformMouse,
                          uniform,
+                         uniformP5,
+                         uniformTiempoP5,
+                         uniformResolucionP5,
+                         uniformMouseP5,
                          dimensionar,
                          emplazar,
-                         vincular,
+                         asociar,
                          inicializar
                          }, 
                          functionActuaria(),                     // Se adicionan los métodos de la "Función Actuaria"

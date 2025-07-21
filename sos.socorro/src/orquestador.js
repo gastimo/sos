@@ -35,6 +35,7 @@ function Orquestador(sos, contenedor) {
     let   _funcionActuaria;
     let   _contenedor = contenedor;
     let   _escena;
+    let   _diferido = false;
     
     // Variables para los actos (funciones) a ser orquestados
     let _funcionPreparacion;
@@ -140,7 +141,7 @@ function Orquestador(sos, contenedor) {
 //  DEFINICIÓN DE LOS MÉTODOS DEL PROPIO ORQUESTADOR
 //  
 // ==============================================================
-    
+  
     /**
      * vincular
      * Se estalece el vínculo entre el orquestador, la escena y
@@ -149,14 +150,37 @@ function Orquestador(sos, contenedor) {
      * al momento de la creación del orquestador, la información
      * necesaria para convertirlo en el socorrista designado.
      */
-    function vincular(escena, three, p5) {
-        S.O.S.THREE = three;
-        S.O.S.P5    = p5;
+    function vincular(escena) {
         _escena = escena;
-        _escena.vincular(three, p5);
-        _processing = p5 ? true : false;
-        _reloj = new S.O.S.THREE.Clock();
+        if (S.O.S.hasOwnProperty('THREE')) {
+            _escena.asociar('THREE', S.O.S.THREE);
+        }
+        if (S.O.S.hasOwnProperty('P5')) {
+            _escena.asociar('P5', S.O.S.P5);
+        }
         S.O.S.revelar(S.O.S, Cargador(), escena);
+    }  
+    
+    /**
+     * asociar
+     * Asocia componentes como parte del socorrista designado.
+     */
+    function asociar(nombre, componente) {
+        if (nombre == 'THREE') {
+            S.O.S.THREE = componente;
+            _reloj = new S.O.S.THREE.Clock();
+            if (_escena)
+                _escena.asociar(nombre, componente);
+        }
+        else if (nombre == 'P5') {
+            S.O.S.P5 = componente;
+            _processing = true;
+            if (_escena)
+                _escena.asociar(nombre, componente);
+        }
+        else {
+            S.O.S[nombre] = componente;
+        }
     }    
     
     /**
@@ -215,7 +239,7 @@ function Orquestador(sos, contenedor) {
                 return;
             }
             else if (_funcionPreparacion && _actoPreparacionIniciado && !_actoPreparacionFinalizado) {
-                _actoPreparacionFinalizado = S.O.S.cargaCompletada();
+                _actoPreparacionFinalizado = _escena && S.O.S.cargaCompletada();
                 return;
             }
             if (_funcionIniciacion && !_actoIniciacionIniciado) {
@@ -296,6 +320,9 @@ function Orquestador(sos, contenedor) {
         const _movimientoMouse = (evt) => {
             _valorUniformMouse[CONFIG.UNIFORM_VALOR].x = evt.offsetX / _valorUniformResolucion[CONFIG.UNIFORM_VALOR].x;
             _valorUniformMouse[CONFIG.UNIFORM_VALOR].y = evt.offsetY / _valorUniformResolucion[CONFIG.UNIFORM_VALOR].y;
+            if (_processing) {
+                _escena.uniformMouseP5(_valorUniformMouse[CONFIG.UNIFORM_VALOR]);
+            }
         };
         _contenedor.seguimientoMouse(_movimientoMouse);
     }
@@ -306,25 +333,47 @@ function Orquestador(sos, contenedor) {
      * del bucle, justo antes de ejecutar el "Acto 3".
      */
     function verificacionPreActo3() {
-        // Primero, se verifica si cambiaron las dimensiones del contenedor
-        if (_contenedor.actualizar()) {
-            // Se actualizan las dimensiones de la escena
-            _escena.dimensionar(_contenedor.geometria.ancho, _contenedor.geometria.alto);
-            
-            // Actualización del "uniform" para la resolución
-            _valorUniformResolucion[CONFIG.UNIFORM_VALOR].x = _contenedor.geometria.ancho;
-            _valorUniformResolucion[CONFIG.UNIFORM_VALOR].y = _contenedor.geometria.alto;
+        if (_contenedor && _escena) {
+            // Primero, se verifica si cambiaron las dimensiones del contenedor
+            if (_contenedor.actualizar()) {
+                // Se actualizan las dimensiones de la escena
+                _escena.dimensionar(_contenedor.geometria.ancho, _contenedor.geometria.alto);
+
+                // Actualización del "uniform" para la resolución
+                if (_valorUniformResolucion) {
+                    _valorUniformResolucion[CONFIG.UNIFORM_VALOR].x = _contenedor.geometria.ancho;
+                    _valorUniformResolucion[CONFIG.UNIFORM_VALOR].y = _contenedor.geometria.alto;
+                    if (_processing) {
+                        _escena.uniformResolucionP5(_valorUniformResolucion[CONFIG.UNIFORM_VALOR]);
+                    }
+                }
+            }
+            // Se actualiza el "uniform" para el tiempo
+            if (_valorUniformTiempo) {
+                _valorUniformTiempo[CONFIG.UNIFORM_VALOR] += _reloj.getDelta();
+                if (_processing) {
+                    _escena.uniformTiempoP5(_valorUniformTiempo[CONFIG.UNIFORM_VALOR]);
+                }
+            }
         }
-        // Se actualiza el "uniform" para el tiempo
-        _valorUniformTiempo[CONFIG.UNIFORM_VALOR] += _reloj.getDelta();
     }
+   
     
     /**
-     * bucleIniciado
-     * Indica si ya se ha dado comienzo al bucle eterno 
-     * del "Acto 3" de la obra.
+     * acto2ListoParaIniciar
+     * Indica si el acto 2 está en condiciones de ser iniciado,
+     * por ejempo, porque ya se cargaron los archivos.
      */
-    function bucleIniciado() {
+    function acto2ListoParaIniciar() {
+        return !_funcionPreparacion || _actoPreparacionFinalizado;
+    }
+    
+    
+    /**
+     * acto3ListoParaIniciar
+     * Indica si se puede dar comienzo al bucle eterno del acto 3.
+     */
+    function acto3ListoParaIniciar() {
         return _actoEjecucionIniciado;
     }
     
@@ -337,6 +386,18 @@ function Orquestador(sos, contenedor) {
         return _processing;
     }
     
+    /**
+     * diferido
+     * Permite gestionar el valor de un indicador que informa
+     * si algunos de los actos ha sido diferido.
+     */
+    function diferido(diferir) {
+        if (diferir !== undefined) {
+            _diferido = diferir;
+        }
+        return _diferido;
+    }
+    
     
     // ==================================================================
     // ===> Se exponen únicamente las funciones públicas del orquestador 
@@ -344,13 +405,16 @@ function Orquestador(sos, contenedor) {
     // ==================================================================
     return {
             vincular,
+            asociar,
             socorrista,
             funcionActuaria, 
             orquestar,
             verificacionPosActo2,
             verificacionPreActo3,
-            bucleIniciado,
-            processing
+            acto2ListoParaIniciar,
+            acto3ListoParaIniciar,
+            processing,
+            diferido
            };
 }
 

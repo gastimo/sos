@@ -133,13 +133,15 @@ function Contenedor(elementoDOM, guardarProporciones = false, ancho = 0, alto = 
      * el navegador (ej. cambio de tamaño de la ventana, scrolling, etc).
      */
     function _actualizarLienzo() {
-        if (!_esPrincipal && _lienzo) {
-            _lienzo.style.position = "absolute";
-            _lienzo.style.left = geometria.x + "px";
-            _lienzo.style.top  = geometria.y + "px";
-        }    
+        if (_lienzo) {
+            _lienzo.style.display = "block";
+            if (!_esPrincipal) {
+                _lienzo.style.position = "absolute";
+                _lienzo.style.left = geometria.x + "px";
+                _lienzo.style.top = geometria.y + "px";
+            } 
+        }  
     }
-    
     
 
     // =================================================================

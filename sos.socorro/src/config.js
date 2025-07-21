@@ -19,9 +19,6 @@ const Config = (() => {
         NOMBRE_ESQUEMA          : 'ESQUEMA',    // Definición de los atributos y valores de una entidad
         NOMBRE_ATRIBUTO         : 'ATRIBUTO',   // Definición de cada uno de los atributos de un esquema
         
-        // Código shader por defecto
-        VERTEX_SHADER           : 'void main() { gl_Position = vec4( position, 1.0 ); }',
-
         // Uniforms estándares
         UNIFORM_VALOR           : "value",
         UNIFORM_TIEMPO          : "u_time",
@@ -32,6 +29,21 @@ const Config = (() => {
         ACTO_PREPARACION        : 'cargar',
         ACTO_INICIACION         : 'comenzar',
         ACTO_EJECUCION          : 'desplegar',
+        
+        // Código shader por defecto
+        VERTEX_SHADER_THREE     : 'void main() { gl_Position = vec4( position, 1.0 ); }',
+        VERTEX_SHADER_P5        : `
+precision highp float;
+attribute vec3 aPosition;
+uniform mat4 uProjectionMatrix;
+uniform mat4 uModelViewMatrix;
+varying vec3 vPosition;
+void main() {
+  vPosition = aPosition;
+  gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
+}
+`,
+
     };
     
     return _parametros;
