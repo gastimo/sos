@@ -74,6 +74,7 @@ const Obra = (() => {
         }
         return {O: {S: _nuevoSeguidor}};
     }
+
     
     return {darInicio, orquestar, seguidor};
 })();
@@ -155,7 +156,6 @@ const Siervo = () => {
         }
     }
    
-    
     
 // =====================================================================
 // 
@@ -296,6 +296,8 @@ const Siervo = () => {
     return {socorrista,
             obtenerClave,
             revelar,
+            recibirMensaje,
+            recuperarMensajes,
             crearEscena,
             crearEscenaP5,
             Contenedor

@@ -7,36 +7,55 @@
 
 
 /**
- * WEB SOCKET 2 - "La Presentalla" (puerto 8091)
- * Intermediario (web socket) entre la nube y sus seguidores.
- * Responsable de recibir y canalizar los mensajes de los 
- * siervos hacia la nube a través del protocolo OSC, durante
- * el ritual de arrobamiento y veneración.
+ * prepararMensaje
+ * Se construye el mensaje a ser enviado a "La Presentalla".
+ * Este método incorpora información extraida de la propia petición 
+ * HTML originada por el siervo para ser entregada como ofrenda 
+ * digital y monitoreada desde "La Presentalla".
  */
+const prepararMensaje = (socket, msj, dir, tipo) => {
+    const _SEPARADOR = ' ';
+    const _mensajeRecibido = msj.split(_SEPARADOR);
+    const _cuerpoMensaje   = _mensajeRecibido.slice( dir ? 0 : 1);
+    const _direccionOSC    = dir ? ['/' + dir + '/' + tipo] : [_mensajeRecibido[0]];
+    const _identificacion  = ["DESCONOCIDA"];
+    if (socket.hasOwnProperty("handshake") && socket.handshake.hasOwnProperty("address")) {
+      _identificacion[0] = socket.handshake.address;
+    }
+    return [..._direccionOSC, ..._identificacion, ..._cuerpoMensaje];
+};
 
-var osc1 = require('node-osc'),
-    io1  = require('socket.io').listen(8091);
-var oscServer1, oscClient1;
 
-io1.on('connection', function (socket) {
+/**
+ * WEB SOCKET "PRESENTALLA" (puerto 8091)
+ * Intermediario (web socket) entre los seguidores y la
+ * pantalla principal para la colecta y el monitoreo en
+ * línea de las ofrendas digitales ("La Presentalla").
+ */
+var osc = require('node-osc'),
+    io  = require('socket.io').listen(8091);
+var oscServer, oscClient;
+
+io.on('connection', function (socket) {
   socket.on('config', function (obj) {
     console.log('config', obj);
-    oscServer1 = new osc1.Server(obj.server.port, obj.server.host);
-    oscClient1 = new osc1.Client(obj.client.host, obj.client.port);
-
-    oscClient1.send('/status', socket.id + ' connected');
-
-    oscServer1.on('message', function(msg, rinfo) {
+    oscServer = new osc.Server(obj.server.port, obj.server.host);
+    oscClient = new osc.Client(obj.client.host, obj.client.port);
+    const _mensaje = prepararMensaje(socket, socket.id, process.env.OSC_DIRECCION_PRESENTALLA, process.env.OSC_MENSAJE_CONEXION);
+    oscClient.send(..._mensaje);
+    
+    oscServer.on('message', function(msg, rinfo) {
       socket.emit('message', msg);
-      console.log('Mensajes furtivos de extracción de datos del SEGUIDOR.', msg, rinfo);
+      console.log('Mensaje hacia LA PRESENTALLA.', msg, rinfo);
     });
   });
   socket.on('message', function (obj) {
-    var toSend = obj.split(' ');
-    oscClient1.send(...toSend);
-    console.log('Confirmación de la colecta de la PRESENTALLA.', toSend);
+    const _mensaje = prepararMensaje(socket, obj);
+    oscClient.send(..._mensaje);
   });
+  
   socket.on("disconnect", function () {
-    oscServer1.kill();
+    console.log("Un SIERVO se acaba de desconectar de la PRESENTALLA...");
+    //oscServer.kill();
   });
 });

@@ -5,4 +5,13 @@
  * 
  * =============================================================================
  */
-console.log(__PANTALLA_NOMBRE__);
+import * as S from 'socorro';
+import Feed from './recompensa';
+
+/**
+ * Pantalla
+ * Controlador de la pantalla del "Siervo"
+ */
+const Pantalla = (() => {
+ const _feed = Feed(S.O.S, document.getElementById("SOS-Feed"));
+})();

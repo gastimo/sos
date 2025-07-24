@@ -8,9 +8,6 @@
 import * as S from 'socorro';
 
 let fragmentShader;
-let fillShader;
-let vertSrc;
-let fragSrc;
 const escenificador = S.O.S.crearEscenaP5();
 
 /**
@@ -28,9 +25,3 @@ escenificador.alComenzar((S) => {
     S.O.S.uniformTiempo("u_time");
     S.O.S.uniformResolucion("u_resolution");
 });
-
-/**
- * alDesplegar (DRAW)
- */
-//escenificador.alDesplegar((S) => {
-//});

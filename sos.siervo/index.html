@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="/src/estilos/sos.siervo.css">
   </head>
-  <body>
+  <body class="-SOS-feed">
 
     <!-- MENSAJERO (OSC) DE LA PANTALLA-SIERVO                      -->
     <!-- Intermediario (web socket) entre el siervo y las restantes -->
@@ -19,11 +19,12 @@
     <script src="http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%/socket.io/socket.io.js"></script>
 
     <script>
-      // Canal de comunicación con "La Nube"
-      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv 
-       var socket = io('http://%VITE_MENSAJERO_NUBE_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%');
-       socket.on('connect', function() {
-        socket.emit('config',
+      // CANAL DE COMUNICACIÓN HACIA "LA NUBE"
+      // Envío de mensajes OSC en respuesta al "scrolling".
+      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+       var conexionNUBE = io('http://%VITE_MENSAJERO_NUBE_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%');
+       conexionNUBE.on('connect', function() {
+        conexionNUBE.emit('config',
             {server: {port: 9998,
                      host: '127.0.0.1'
              },
@@ -33,15 +34,16 @@
             }
         );});
     
-      socket.on('message', function(obj) {
+      conexionNUBE.on('message', function(obj) {
         console.log(obj);
       });
 
-      // Canal de comunicación con "La Presentalla"
-      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-       var socket2 = io('http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%');
-       socket2.on('connect', function() {
-        socket2.emit('config',
+      // CANAL DE COMUNICACIÓN HACIA "LA PRESENTALLA"
+      // Envío de mensajes OSC con las ofrendas digitales.
+      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+       var conexionPRESENTALLA = io('http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%');
+       conexionPRESENTALLA.on('connect', function() {
+        conexionPRESENTALLA.emit('config',
             {server: {port: 9998,
                      host: '127.0.0.1'
              },
@@ -51,17 +53,14 @@
             }
         );});
     
-      socket2.on('message', function(obj) {
+      conexionPRESENTALLA.on('message', function(obj) {
         console.log(obj);
       });
 
     </script>
-      
+    
+    <div id="SOS-Feed" class=".-SOS-feed "></div>
     <script type="module" src="/src/pantalla.js"></script>
-        ¡Gloria a la Nube!
-
-    <button onclick="socket.emit('message', '/mensaje/NUBE 1 2 3');">Send /mensaje/NUBE/ 1 2 3</button>
-    <button onclick="socket2.emit('message', '/mensaje/PRESENTALLA 1 2 3');">Send /mensaje/PRESENTALLA/ 1 2 3</button>
 
   </body>
 </html>

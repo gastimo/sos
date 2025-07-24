@@ -18,9 +18,7 @@ export default defineConfig(({ mode }) => {
     // DEFINICIÓN DE PARÁMETROS Y CONFIGURACIÓN DEL MÓDULO
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     define: {
-      __PANTALLA_NOMBRE__   : JSON.stringify(env.VITE_PANTALLA_NUBE_NOMBRE),
-      __PANTALLA_ANCHO__    : 1920,
-      __PANTALLA_ALTO__     : 1080
+      __PANTALLA_NOMBRE__   : JSON.stringify(env.VITE_PANTALLA_NUBE_NOMBRE)
     },
     
     optimizeDeps: {
