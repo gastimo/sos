@@ -1,6 +1,6 @@
 {
   "name": "socorro",
-  "version": "0.0.22",
+  "version": "0.0.24",
   "description": "Siervos de la Obra del Socorro (S.O.S)",
   "main": "./dist/index.js",
   "scripts": {
@@ -12,6 +12,7 @@
     "socorrista",
     "siervo",
     "obra",
+    "escena",
     "shader",
     "p5js",
     "glsl"

@@ -26,13 +26,19 @@ function Contenedor(elementoDOM, guardarProporciones = false, ancho = 0, alto = 
     
     /**
      * lienzo
-     * Almacena el canvas que debe colocarse dentro del contenedor
-     * y donde se realizará el "render" de la escena.
+     * Establece y devuelve el lienzo ("canvas") del contenedor, 
+     * donde luego se realizará el "render" de la escena.
+     * Si el parámetro "canvas" está definido, se almacena este
+     * valor internamente en el contenedor.
+     * Se devuelse siempre el valor actual almacenado del lienzo.
      */
     function lienzo(canvas) {
-        _lienzo = canvas;
-        _contenedorReal.appendChild(_lienzo);
-        _actualizarLienzo();
+        if (canvas !== undefined) {
+            _lienzo = canvas;
+            _contenedorReal.appendChild(_lienzo);
+            _actualizarLienzo();
+        }
+        return _lienzo;
     }
    
     

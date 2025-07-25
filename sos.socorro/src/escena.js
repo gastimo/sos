@@ -205,9 +205,33 @@ function Escena(sos) {
 
 // =====================================================================
 // 
-//  FUNCIONES PARA EMPLAZAR, CONFIGURAR Y REPRODUCIR LA ESCENA
+//  FUNCIONES PARA EMPLAZAR y MANIPULAR EL "LIENZO" DE LA ESCENA
 //  
 // =====================================================================
+    
+    /**
+     * ancho
+     * Devuelve el ancho de la escena, o sea, la anchura
+     * del lienzo donde se realiza el "render".
+     */
+    function ancho() {
+        if (_contenedor) {
+            return _contenedor.geometria.ancho;
+        }
+        return 0;
+    }
+    
+    /**
+     * alto
+     * Devuelve el alto de la escena, o sea, la altura
+     * del lienzo donde se realiza el "render".
+     */
+    function alto() {
+        if (_contenedor) {
+            return _contenedor.geometria.alto;
+        }
+        return 0;
+    }
     
     /**
      * dimensionar
@@ -222,6 +246,15 @@ function Escena(sos) {
             S.O.S.P5.resizeCanvas(ancho, alto);
             S.O.S.P5.ortho(-ancho / 2, ancho / 2, -alto / 2, alto / 2);             
         }
+    }
+
+    /**
+     * lienzo
+     * Devuelve el lienzo (el "canvas" HTML) que se utiliza
+     * para llevar a cabo el "render" de la escena.
+     */
+    function lienzo() {
+        _contenedor.lienzo(rendererP5.canvas);  
     }
     
     /**
@@ -240,7 +273,6 @@ function Escena(sos) {
             _emplazarLienzoP5();
         }
     }
-        
 
     /**
      * _emplazarLienzoTHREE
@@ -324,6 +356,7 @@ function Escena(sos) {
      * Función que crea la "Definición" del esquema asociado a la escena.
      * Los atributos que se inicialicen en este punto podrán ser importados,
      * exportados y/o manipulados desde la GUI del "Panel Conrolador".
+     * >>> PENDIENTE DE IMPLEMENTACIÓN
      */
     function inicializar() {
     }
@@ -331,6 +364,8 @@ function Escena(sos) {
     /**
      * asociar
      * Asocia componentes como parte del socorrista designado.
+     * Se exponen las librerías de p5js y Three.js a través del
+     * socorrista creado para atender a la instancia de la escena.
      */
     function asociar(nombre, componente) {
         if (nombre == 'THREE') {
@@ -359,7 +394,10 @@ function Escena(sos) {
                          uniformTiempoP5,
                          uniformResolucionP5,
                          uniformMouseP5,
+                         ancho,
+                         alto,
                          dimensionar,
+                         lienzo,
                          emplazar,
                          asociar,
                          inicializar

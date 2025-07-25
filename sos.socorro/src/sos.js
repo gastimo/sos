@@ -156,6 +156,16 @@ const Siervo = () => {
         }
     }
    
+    /**
+     * mapear
+     * Función de ayuda para remapear el valor de un número
+     * (parámetro "valor") perteneciente al rango inicial 
+     * [ini1-fin1], hacia el rango destino [ini2-fin2].
+     */
+    function mapear(valor, ini1, fin1, ini2, fin2) {
+        return (valor - ini1) / (fin1 - ini1) * (fin2 - ini2) + ini2;
+    }
+    
     
 // =====================================================================
 // 
@@ -296,8 +306,7 @@ const Siervo = () => {
     return {socorrista,
             obtenerClave,
             revelar,
-            recibirMensaje,
-            recuperarMensajes,
+            mapear,
             crearEscena,
             crearEscenaP5,
             Contenedor
