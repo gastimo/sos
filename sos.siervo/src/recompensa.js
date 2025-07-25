@@ -21,10 +21,11 @@
  */
 function Feed(sos, contenedor) {
     const S = sos.socorrista();
-    const _contenedor = contenedor;
-    const _recompensas = [];
-    const _incentivos  = [];
-    const _reinicio    = Reinicio();
+    const _contenedor    = contenedor;
+    const _recompensas   = [];
+    const _incentivos    = [];
+    const _reinicio      = Reinicio();
+    const _imagenObscena = __IMAGENES_INCENTIVOS__[Math.floor(S.O.S.azar(0, __IMAGENES_INCENTIVOS__.length))];
 
     // CREACIÓN DE INCENTIVOS
     // Definición de los incentivos: "imágenes-cebos" que incitan
@@ -239,7 +240,7 @@ function Feed(sos, contenedor) {
             _escenificador = S.O.S.crearEscena(_elementoHTML);
             _escenificador.alCargar((S) => {
                 _fragmentShader  = S.O.S.cargarShader('/shaders/incentivo.frag');
-                _imagenIncentivo = S.O.S.cargarTextura2D('imagenes/incentivo_01.jpg');
+                _imagenIncentivo = S.O.S.cargarTextura2D(_imagenObscena);
             });
             _escenificador.alComenzar((S) => {
                 S.O.S.fragmentShader(_fragmentShader);
@@ -255,14 +256,14 @@ function Feed(sos, contenedor) {
                 // están más pixeladas. Cuanto mayor es el "scrolling" el 
                 // pixelado se reduce, pero aumenta el "blur" de forma tal
                 // que nunca se pueda ver la imagen realmente.
-                let _blur  = Math.log(_gradoIncentivo + 1) * 15;
+                let _blur  = Math.log(_gradoIncentivo + 2) * 10;
                 let _nivel = _gradoIncentivo < 3 ? 13 : 
                             _gradoIncentivo < 6 ? 11 : 
                             _gradoIncentivo < 10 ? 8 : 
                             _gradoIncentivo < 36 ? 6 : 
                             _gradoIncentivo < 50 ? 5.5 :
                             _gradoIncentivo < 60 ? 5 : 4.5;
-                let _escala = S.O.S.mapear(Math.max(240 - (_gradoIncentivo * _nivel), 1), 1, 240, 8, 120);
+                let _escala = S.O.S.mapear(Math.max(240 - (_gradoIncentivo * _nivel), 1), 1, 240, 7, 100);
                 S.O.S.uniform("u_pixelSize", _escala, _escala);
                 S.O.S.uniform("u_blurAmount", _blur);
                 S.O.S.desplegar();

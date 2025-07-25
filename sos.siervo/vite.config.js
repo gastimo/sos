@@ -12,7 +12,16 @@ export default defineConfig(({ mode }) => {
       __OSC_MENSAJE_CONEXION__      : JSON.stringify(env.OSC_MENSAJE_CONEXION),
       __OSC_MENSAJE_ARROBAR__       : JSON.stringify(env.OSC_MENSAJE_ARROBAR),
       __OSC_MENSAJE_OFRENDAR__      : JSON.stringify(env.OSC_MENSAJE_OFRENDAR),
-      __CANTIDAD_INCENTIVOS__       : 3
+      __CANTIDAD_INCENTIVOS__       : 3,
+      __IMAGENES_INCENTIVOS__       : ['/imagenes/incentivo_01.jpg',
+                                    '/imagenes/incentivo_02.jpg',
+                                    '/imagenes/incentivo_03.jpg',
+                                    '/imagenes/incentivo_04.jpg',
+                                    '/imagenes/incentivo_05.jpg',
+                                    '/imagenes/incentivo_06.jpg',
+                                    '/imagenes/incentivo_07.jpg',
+                                    '/imagenes/incentivo_08.jpg',
+                                    '/imagenes/incentivo_09.jpg']
     },
     server: {
         open: true,
