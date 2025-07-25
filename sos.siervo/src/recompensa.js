@@ -14,7 +14,7 @@
  * El "feed" comienza con una portada que invita al seguidor a dar inicio al 
  * recorrido por la pantalla, desplegando recompensas con incentivos visuales
  * en la medida que la acción de "scrolling" avanza.
- * Cada recompensa consiste de una imagen provocadora sugiriendo algún tipo
+ * Cada recompensa consiste en una imagen provocadora sugiriendo algún tipo
  * de obscenidad pero que no se revela nunca completamente (la "imagen-cebo" del 
  * incentivo). Sólo la acción del "scrolling" permite ir exponiendo gradualmente
  * su contenido, haciéndolo cada vez más nítido aunque nunca enteramente visible.
@@ -29,6 +29,9 @@ function Feed(sos, contenedor) {
     // CREACIÓN DE INCENTIVOS
     // Definición de los incentivos: "imágenes-cebos" que incitan
     // al seguidor a hacer "scrolling" para revelar su contenido.
+    // En lugar de crear un incentivo por cada recompensa del "feed" 
+    // se crean una cantidad acotada y se las va reasignando de 
+    // manera circular a cada recompensa ("Round Robin").
     for (let i = 0; i < __CANTIDAD_INCENTIVOS__; i++) {
         _incentivos.push(Incentivo());
     }
@@ -42,8 +45,13 @@ function Feed(sos, contenedor) {
     
     
     // CONTROLADORES DEL SCROLLING DEL "FEED"
-    // "Observador" para detectar cuando una recompensa entra al viewport
-    // y "Listener" para detectar cada movimiento de "scrolling".
+    // Se utilizan dos tipos de objetos diferentes para controlar
+    // el comportamiento del siervo en el "feed":
+    // - LISTENER   : gestiona los eventos que se disparan cada vez
+    //                que se hace "scolling" por la página. Se ocupa
+    //                de enviar los mensajes OSC, entre otras cosas.
+    // - OBSERVADOR : dectac cuando una recompensa entra al viewport
+    //                para desplegar el incentivo correspondiente.
     const _opcionesObservador = {
         root: _contenedor, 
         rootMargin: '0px',
@@ -63,6 +71,10 @@ function Feed(sos, contenedor) {
      * Iniciacion
      * Elemento visual que funciona a modo de portada que da inicio
      * al viaje del seguidor a lo largo de su "feed scrolleable".
+     * La iniciación le da la bienvenida al seguidor y lo invita a
+     * comenzar el recorrido por la pantalla del siervo mediante el
+     * "scrolling". Luego de iniciado, este elemento cambia para, en
+     * vez de dar la bievenida, incite al seguidor a continuar.
      */
     function Iniciacion() {
         let _convertido = false;
@@ -148,7 +160,7 @@ function Feed(sos, contenedor) {
             // Se despliega el incentivo de la recompensa, reutilizando alguno
             // de los incentivos ya creados al inicio del "feed". Generar un 
             // incentivo por cada recompensa sería demasiado costoso ya que
-            // cada uno de ellos crea una imagen mediante "shaders".
+            // cada uno de ellos crea una imagen mediante "shaders" GLSL.
             _elementoHTML.innerHTML = "";
             _incentivo.emplazar(_elementoHTML, _ubicacion);
 
@@ -173,6 +185,8 @@ function Feed(sos, contenedor) {
          * muy costosa (cada incentivo termina siendo una imagen generada con "shaders"),
          * se crea sólo al comienzo una cantidad limitada de ellos y se los va reutilizando
          * en la medida que las recompensas se depliegan (se hacen visibles) en el "feed".
+         * El grado de exposición de la obscenidad del incentivo (que tan pixelado o 
+         * desenfocado) depende del nivel de profundidad de la recompensa en el recorrido.
          */
         function _determinarExposicion(entradas, observador) {
             entradas.forEach(entrada => {
@@ -197,48 +211,77 @@ function Feed(sos, contenedor) {
      * Imagen sugerente, nunca revelada por completo, que funciona como
      * una especie "cebo visual" para seducir al seguidor, obnubilarlo e
      * inducirlo constantemente a seguir haciendo "scrolling".
+     * El incentivo es construido a partir de una imagen obscena que, con 
+     * el uso de "shaders", es pixelada y desenfocada. Cuanto más profundo
+     * en el "feed" se encuentre el incentivo, más reveladora será la imagen,
+     * aunque nunca termina de develarse enteramente.
      */
     function Incentivo() {
         let _gradoIncentivo = 0;
         let _elementoHTML = document.createElement('div');
         _elementoHTML.classList.add('-SOS-incentivo');
 
+        // Variables para el módulo del "socorro"
+        let _escenificador;
         let _fragmentShader;
         let _imagenIncentivo;
-        const _escenificador = S.O.S.crearEscena(_elementoHTML);
-        _escenificador.alCargar((S) => {
-            _fragmentShader  = S.O.S.cargarShader('/shaders/incentivo.frag');
-            _imagenIncentivo = S.O.S.cargarTextura2D('imagenes/incentivo_01.jpg');
-        });
-        _escenificador.alComenzar((S) => {
-            S.O.S.fragmentShader(_fragmentShader);
-            S.O.S.uniformTiempo("u_time");
-            S.O.S.uniformResolucion("u_resolution");
-            S.O.S.uniform("u_texture", _imagenIncentivo);
-            S.O.S.uniform("u_blurAmount", 61);
-            S.O.S.uniform("u_pixelSize", 100, 100);
-        });
-        _escenificador.alDesplegar((S) => {
-            let _blur  = Math.log(_gradoIncentivo + 1) * 15;
-            let _nivel = _gradoIncentivo < 3 ? 13 : 
-                        _gradoIncentivo < 6 ? 11 : 
-                        _gradoIncentivo < 10 ? 8 : 
-                        _gradoIncentivo < 36 ? 6 : 
-                        _gradoIncentivo < 50 ? 5.5 :
-                        _gradoIncentivo < 60 ? 5 : 4.5;
-            let _escala = _map(Math.max(240 - (_gradoIncentivo * _nivel), 1), 1, 240, 8, 120);
-            S.O.S.uniform("u_pixelSize", _escala, _escala);
-            S.O.S.uniform("u_blurAmount", _blur);
-            S.O.S.desplegar();
-        });
         
-        function emplazar(contenedor, nivel) {
-            contenedor.appendChild(_elementoHTML);
-            _gradoIncentivo = nivel;
+        /**
+         * _imagenCebo
+         * Función privada que se ocupa de crear la imagen que se
+         * utilizará como incentivo. Internamente lo que hace este
+         * método es invocar las funciones del módulo del "socorro"
+         * que permiten crear escenas utilizando tanto la librería
+         * p5js como Three.hs. En este caso, el incentivo se crea
+         * simplemente como un "fragment shader" de Three.js.
+         */
+        function _imagenCebo() {
+            _escenificador = S.O.S.crearEscena(_elementoHTML);
+            _escenificador.alCargar((S) => {
+                _fragmentShader  = S.O.S.cargarShader('/shaders/incentivo.frag');
+                _imagenIncentivo = S.O.S.cargarTextura2D('imagenes/incentivo_01.jpg');
+            });
+            _escenificador.alComenzar((S) => {
+                S.O.S.fragmentShader(_fragmentShader);
+                S.O.S.uniformTiempo("u_time");
+                S.O.S.uniformResolucion("u_resolution");
+                S.O.S.uniform("u_texture", _imagenIncentivo);
+                S.O.S.uniform("u_blurAmount", 61);
+                S.O.S.uniform("u_pixelSize", 100, 100);
+            });
+            _escenificador.alDesplegar((S) => {
+                // NIVEL DE REVELACIÓN
+                // Las recompensas que se muestran más arriba en el "feed" 
+                // están más pixeladas. Cuanto mayor es el "scrolling" el 
+                // pixelado se reduce, pero aumenta el "blur" de forma tal
+                // que nunca se pueda ver la imagen realmente.
+                let _blur  = Math.log(_gradoIncentivo + 1) * 15;
+                let _nivel = _gradoIncentivo < 3 ? 13 : 
+                            _gradoIncentivo < 6 ? 11 : 
+                            _gradoIncentivo < 10 ? 8 : 
+                            _gradoIncentivo < 36 ? 6 : 
+                            _gradoIncentivo < 50 ? 5.5 :
+                            _gradoIncentivo < 60 ? 5 : 4.5;
+                let _escala = S.O.S.mapear(Math.max(240 - (_gradoIncentivo * _nivel), 1), 1, 240, 8, 120);
+                S.O.S.uniform("u_pixelSize", _escala, _escala);
+                S.O.S.uniform("u_blurAmount", _blur);
+                S.O.S.desplegar();
+            });
         }
         
-        function _map(valor, ini1, fin1, ini2, fin2) {
-            return (valor - ini1) / (fin1 - ini1) * (fin2 - ini2) + ini2;
+        /**
+         * emplazar
+         * Reubica el incentivo en el contenedor recibido como argumento
+         * (los incentivos se reasignan de forma circular a las recompensas).
+         * El parámetro "nivel" indica qué tan profundo en el "feed" se 
+         * encuenta para calcular su grado de exposición.
+         */
+        function emplazar(contenedor, nivel) {
+            if (!_escenificador) {
+                _imagenCebo();
+            }
+            contenedor.appendChild(_elementoHTML);
+            _gradoIncentivo = nivel;
         }
         
         return {emplazar};
