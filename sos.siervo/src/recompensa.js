@@ -150,7 +150,7 @@ function Feed(sos, contenedor) {
             // incentivo por cada recompensa sería demasiado costoso ya que
             // cada uno de ellos crea una imagen mediante "shaders".
             _elementoHTML.innerHTML = "";
-            _elementoHTML.appendChild(_incentivo);
+            _incentivo.emplazar(_elementoHTML, _ubicacion);
 
             // Se añaden recompensas adicionales a continuación de la actual
             // para asegurarse que el "scrolling" perdure infinitamente.
@@ -199,22 +199,49 @@ function Feed(sos, contenedor) {
      * inducirlo constantemente a seguir haciendo "scrolling".
      */
     function Incentivo() {
+        let _gradoIncentivo = 0;
         let _elementoHTML = document.createElement('div');
         _elementoHTML.classList.add('-SOS-incentivo');
 
         let _fragmentShader;
-        const _escenificador = S.O.S.crearEscenaP5(_elementoHTML);
+        let _imagenIncentivo;
+        const _escenificador = S.O.S.crearEscena(_elementoHTML);
         _escenificador.alCargar((S) => {
-            _fragmentShader = S.O.S.cargarShader('/shaders/p5_fragment_base.frag');
+            _fragmentShader  = S.O.S.cargarShader('/shaders/incentivo.frag');
+            _imagenIncentivo = S.O.S.cargarTextura2D('imagenes/incentivo_01.jpg');
         });
         _escenificador.alComenzar((S) => {
             S.O.S.fragmentShader(_fragmentShader);
             S.O.S.uniformTiempo("u_time");
             S.O.S.uniformResolucion("u_resolution");
-            S.O.S.uniformResolucion("u_mouse");
+            S.O.S.uniform("u_texture", _imagenIncentivo);
+            S.O.S.uniform("u_blurAmount", 61);
+            S.O.S.uniform("u_pixelSize", 100, 100);
         });
-
-        return _elementoHTML;
+        _escenificador.alDesplegar((S) => {
+            let _blur  = Math.log(_gradoIncentivo + 1) * 15;
+            let _nivel = _gradoIncentivo < 3 ? 13 : 
+                        _gradoIncentivo < 6 ? 11 : 
+                        _gradoIncentivo < 10 ? 8 : 
+                        _gradoIncentivo < 36 ? 6 : 
+                        _gradoIncentivo < 50 ? 5.5 :
+                        _gradoIncentivo < 60 ? 5 : 4.5;
+            let _escala = _map(Math.max(240 - (_gradoIncentivo * _nivel), 1), 1, 240, 8, 120);
+            S.O.S.uniform("u_pixelSize", _escala, _escala);
+            S.O.S.uniform("u_blurAmount", _blur);
+            S.O.S.desplegar();
+        });
+        
+        function emplazar(contenedor, nivel) {
+            contenedor.appendChild(_elementoHTML);
+            _gradoIncentivo = nivel;
+        }
+        
+        function _map(valor, ini1, fin1, ini2, fin2) {
+            return (valor - ini1) / (fin1 - ini1) * (fin2 - ini2) + ini2;
+        }
+        
+        return {emplazar};
     }
     
     

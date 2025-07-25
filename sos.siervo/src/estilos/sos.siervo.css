@@ -1,6 +1,7 @@
 body {
   margin: 0;
   padding: 0;
+  background-color: #F7F3E2;
 }
 
 .-SOS-feed {
@@ -20,6 +21,7 @@ body {
   text-align: center;
   min-width: 320px;
   z-index: -10;
+  margin-bottom: 12px;
 }
 
 .-SOS-inicio .-SOS-portada {
