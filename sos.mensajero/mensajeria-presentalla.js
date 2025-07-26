@@ -52,10 +52,13 @@ io.on('connection', function (socket) {
   socket.on('message', function (obj) {
     const _mensaje = prepararMensaje(socket, obj);
     oscClient.send(..._mensaje);
+    console.log('Extrayendo ofrendas digitales del SIERVO...', _mensaje);
   });
   
   socket.on("disconnect", function () {
     console.log("Un SIERVO se acaba de desconectar de la PRESENTALLA...");
+    const _mensaje = prepararMensaje(socket, socket.id, process.env.OSC_DIRECCION_PRESENTALLA, process.env.OSC_MENSAJE_DESCONEXION);
+    oscClient.send(..._mensaje);
     //oscServer.kill();
   });
 });
