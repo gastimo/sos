@@ -13,5 +13,5 @@ import Feed from './recompensa';
  * Controlador de la pantalla del "Siervo"
  */
 const Pantalla = (() => {
- const _feed = Feed(S.O.S, document.getElementById("SOS-Feed"));
+ const _feed = Feed(S, document.getElementById("SOS-Feed"));
 })();

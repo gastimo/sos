@@ -19,8 +19,7 @@
  * incentivo). Sólo la acción del "scrolling" permite ir exponiendo gradualmente
  * su contenido, haciéndolo cada vez más nítido aunque nunca enteramente visible.
  */
-function Feed(sos, contenedor) {
-    const S = sos.socorrista();
+function Feed(S, contenedor) {
     const _contenedor    = contenedor;
     const _recompensas   = [];
     const _incentivos    = [];
