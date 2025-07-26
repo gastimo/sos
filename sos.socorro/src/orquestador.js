@@ -31,7 +31,8 @@ import CONFIG from './config';
 function Orquestador(sos, contenedor) {
     const S = sos.socorrista();
     let   _processing = false;
-    let   _reloj; 
+    let   _reloj;
+    let   _cuadros = 0;
     let   _funcionActuaria;
     let   _contenedor = contenedor;
     let   _escena;
@@ -145,7 +146,7 @@ function Orquestador(sos, contenedor) {
     /**
      * vincular
      * Se estalece el vínculo entre el orquestador, la escena y
-     * el cargador a utilizar durante el acto de "Preparación".
+     * el cargador a usar durante el acto de "Preparación".
      * Esto se lleva a cabo concediéndole al siervo convocado
      * al momento de la creación del orquestador, la información
      * necesaria para convertirlo en el socorrista designado.
@@ -158,6 +159,9 @@ function Orquestador(sos, contenedor) {
         if (S.O.S.hasOwnProperty('P5')) {
             _escena.asociar('P5', S.O.S.P5);
         }
+        S.O.S.conteoDeCuadros = () => {
+            return _processing ? S.O.S.P5.frameCount : _conteoDeCuadros();
+        };
         S.O.S.revelar(S.O.S, Cargador(), escena);
     }  
     
@@ -231,6 +235,7 @@ function Orquestador(sos, contenedor) {
     function orquestar() {
         if (_actoEjecucionIniciado && _funcionEjecucion) {
             _orquestarActo3();
+            _cuadros++;
         }
         else {
             if (_funcionPreparacion && !_actoPreparacionIniciado) {
@@ -254,11 +259,21 @@ function Orquestador(sos, contenedor) {
                     (_funcionPreparacion && _actoPreparacionFinalizado && !_funcionIniciacion) ||
                     _actoIniciacionIniciado) {
                     _orquestarActo3();
+                    _cuadros++;
                     _actoEjecucionIniciado = true;
                     return;
                 }
             }            
         }
+    }
+    
+    /**
+     * _conteoDeCuadros
+     * Función privada del orquestador que devuelve
+     * el número del fotograma actual.
+     */
+    function _conteoDeCuadros() {
+        return _cuadros;
     }
     
     /**

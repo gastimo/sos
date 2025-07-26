@@ -254,7 +254,7 @@ function Escena(sos) {
      * para llevar a cabo el "render" de la escena.
      */
     function lienzo() {
-        _contenedor.lienzo(rendererP5.canvas);  
+        _contenedor.lienzo();  
     }
     
     /**
