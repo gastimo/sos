@@ -4,7 +4,7 @@
   "description": "Siervos del Obnubilante Scrolling (S.O.S.) - El Mensajero",
   "scripts": {
     "arrobamiento": "node --env-file=../sos.config/.env mensajeria-arrobamiento.js",
-    "presentalla" : "node --env-file=../sos.config/.env mensajeria-presentalla.js"
+    "ofrendas"    : "node --env-file=../sos.config/.env mensajeria-ofrendas.js"
   },
   "keywords": [
     "sos",

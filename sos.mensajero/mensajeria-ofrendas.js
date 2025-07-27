@@ -1,6 +1,6 @@
 /* =============================================================================
  * 
- *         C O N E X I Ó N    P A R A    L A    P R E S E N T A L L A
+ *         C O N E X I Ó N    P A R A    E L    A L F O L Ï
  * 
  * =============================================================================
  */
@@ -8,10 +8,10 @@
 
 /**
  * prepararMensaje
- * Se construye el mensaje a ser enviado a "La Presentalla".
+ * Se construye el mensaje a ser enviado a "El Alfolí".
  * Este método incorpora información extraida de la propia petición 
  * HTML originada por el siervo para ser entregada como ofrenda 
- * digital y monitoreada desde "La Presentalla".
+ * digital y contabilizada por "El Alfolí".
  */
 const prepararMensaje = (socket, msj, dir, tipo) => {
     const _SEPARADOR = ' ';
@@ -27,10 +27,11 @@ const prepararMensaje = (socket, msj, dir, tipo) => {
 
 
 /**
- * WEB SOCKET "PRESENTALLA" (puerto 8091)
- * Intermediario (web socket) entre los seguidores y la
- * pantalla principal para la colecta y el monitoreo en
- * línea de las ofrendas digitales ("La Presentalla").
+ * WEB SOCKET "OFRENDAS" (puerto 8091)
+ * Intermediario (web socket) entre el alfolí y los seguidores.
+ * Responsable de recolectar y monitorear los mensajes de los 
+ * siervos hacia el alfolí a través del protocolo OSC, conteniendo
+ * los datos de sus ofrendas digitales.
  */
 var osc = require('node-osc'),
     io  = require('socket.io').listen(8091);
@@ -41,12 +42,12 @@ io.on('connection', function (socket) {
     console.log('config', obj);
     oscServer = new osc.Server(obj.server.port, obj.server.host);
     oscClient = new osc.Client(obj.client.host, obj.client.port);
-    const _mensaje = prepararMensaje(socket, socket.id, process.env.OSC_DIRECCION_PRESENTALLA, process.env.OSC_MENSAJE_CONEXION);
+    const _mensaje = prepararMensaje(socket, socket.id, process.env.OSC_DIRECCION_ALFOLI, process.env.OSC_MENSAJE_CONEXION);
     oscClient.send(..._mensaje);
     
     oscServer.on('message', function(msg, rinfo) {
       socket.emit('message', msg);
-      console.log('Mensaje hacia LA PRESENTALLA.', msg, rinfo);
+      console.log('Mensaje hacia EL ALFOLÍ.', msg, rinfo);
     });
   });
   socket.on('message', function (obj) {
@@ -56,8 +57,8 @@ io.on('connection', function (socket) {
   });
   
   socket.on("disconnect", function () {
-    console.log("Un SIERVO se acaba de desconectar de la PRESENTALLA...");
-    const _mensaje = prepararMensaje(socket, socket.id, process.env.OSC_DIRECCION_PRESENTALLA, process.env.OSC_MENSAJE_DESCONEXION);
+    console.log("Un SIERVO se acaba de desconectar de el ALFOLÍ...");
+    const _mensaje = prepararMensaje(socket, socket.id, process.env.OSC_DIRECCION_ALFOLI, process.env.OSC_MENSAJE_DESCONEXION);
     oscClient.send(..._mensaje);
     //oscServer.kill();
   });

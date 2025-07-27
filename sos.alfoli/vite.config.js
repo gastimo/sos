@@ -6,12 +6,12 @@ export default defineConfig(({ mode }) => {
   return {
     envDir,
     define: {
-      __PANTALLA_NOMBRE__ : JSON.stringify(env.VITE_PANTALLA_PRESENTALLA_NOMBRE),
+      __PANTALLA_NOMBRE__ : JSON.stringify(env.VITE_PANTALLA_ALFOLI_NOMBRE),
     },
     server: {
         open: true,
-        host: env.VITE_PANTALLA_PRESENTALLA_SERVIDOR,
-        port: env.VITE_PANTALLA_PRESENTALLA_PUERTO_WEB
+        host: env.VITE_PANTALLA_ALFOLI_SERVIDOR,
+        port: env.VITE_PANTALLA_ALFOLI_PUERTO_WEB
     },  
   };
 });

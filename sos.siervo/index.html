@@ -13,10 +13,10 @@
     <!-- Intermediario (web socket) entre el siervo y las restantes -->
     <!-- pantallas de la obra. Por un lado, se envían los mensajes  -->
     <!-- de adoración hacia "La Nube" y, por otro lado, se envían   -->
-    <!-- las ofrendas digitales a la pantalla de la "Presentalla".  -->
+    <!-- las ofrendas digitales a la pantalla de "El Alfolí".       -->
     <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
     <script src="http://%VITE_MENSAJERO_NUBE_SERVIDOR%:%VITE_MENSAJERO_NUBE_PUERTO_WEB%/socket.io/socket.io.js"></script>
-    <script src="http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%/socket.io/socket.io.js"></script>
+    <script src="http://%VITE_MENSAJERO_ALFOLI_SERVIDOR%:%VITE_MENSAJERO_ALFOLI_PUERTO_WEB%/socket.io/socket.io.js"></script>
 
     <script>
       // CANAL DE COMUNICACIÓN HACIA "LA NUBE"
@@ -38,22 +38,22 @@
         console.log(obj);
       });
 
-      // CANAL DE COMUNICACIÓN HACIA "LA PRESENTALLA"
+      // CANAL DE COMUNICACIÓN HACIA "EL ALFOLÍ"
       // Envío de mensajes OSC con las ofrendas digitales.
       // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-       var conexionPRESENTALLA = io('http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%');
-       conexionPRESENTALLA.on('connect', function() {
-        conexionPRESENTALLA.emit('config',
+       var conexionALFOLI = io('http://%VITE_MENSAJERO_ALFOLI_SERVIDOR%:%VITE_MENSAJERO_ALFOLI_PUERTO_WEB%');
+       conexionALFOLI.on('connect', function() {
+        conexionALFOLI.emit('config',
             {server: {port: 9998,
                      host: '127.0.0.1'
              },
-             client: {port: %VITE_PANTALLA_PRESENTALLA_PUERTO_OSC%,
-                     host: '%VITE_PANTALLA_PRESENTALLA_SERVIDOR%'
+             client: {port: %VITE_PANTALLA_ALFOLI_PUERTO_OSC%,
+                     host: '%VITE_PANTALLA_ALFOLI_SERVIDOR%'
               }
             }
         );});
     
-      conexionPRESENTALLA.on('message', function(obj) {
+      conexionALFOLI.on('message', function(obj) {
         console.log(obj);
       });
 

@@ -22,7 +22,7 @@
   "dependencies": {
     "node-osc": "^1.2.0",
     "socket.io": "^1.7.4",
-    "socorro": "^0.0.21",
+    "socorro": "^0.0.29",
     "three": "^0.178.0"
   },
   "devDependencies": {

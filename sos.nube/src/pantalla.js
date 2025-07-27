@@ -1,27 +1,20 @@
 /*
  * =============================================================================
- * 
- *  EJEMPLO 1: SHADER SIMPLE BASE
+ *  
+ *                 M Ó D U L O    P A N T A L L A  -  N U B E
  * 
  * =============================================================================
  */
 import * as S from 'socorro';
+import Nube from './nube.js';
 
-let fragmentShader;
-const escenificador = S.O.S.crearEscenaP5();
-
-/**
- * alCargar (PRELOAD)
- */
-escenificador.alCargar((S) => {
-    fragmentShader = S.O.S.cargarShader('shaders/p5_fragment_base.frag');
-});
 
 /**
- * alComenzar (SETUP)
+ * Pantalla
+ * Controlador de la pantalla de "La Nube"
  */
-escenificador.alComenzar((S) => {
-    S.O.S.fragmentShader(fragmentShader);
-    S.O.S.uniformTiempo("u_time");
-    S.O.S.uniformResolucion("u_resolution");
-});
+const Pantalla = (() => {
+ const _nube = Nube(S);
+})();
+
+

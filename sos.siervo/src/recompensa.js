@@ -348,7 +348,7 @@ function Feed(S, contenedor) {
      * La función realiza, básicamente, tres tareas:
      *  1. Actualizar la portada: en lugar de dar la bienvenida, debe invitar al "scrolling".
      *  1. Notificar a "La Nube" acerca de la obnubilación del siervo (su "scrolling").
-     *  2. Dirigir las ofrendas digitales extraídas del siervo hacia "La Presentalla". 
+     *  2. Dirigir las ofrendas digitales extraídas del siervo hacia "El Alfolí". 
      */
     function _obnubilar() {
         let _posY = window.scrollY;
@@ -372,11 +372,11 @@ function Feed(S, contenedor) {
                          _posY);         // Se envía la posición del "scroll" vertical del siervo
         
         
-        // 3 ENVIAR A "LA PRESENTALLA" LA OFRENDA DIGITAL DEL SIERVO
-        // Se envía un mensaje OSC hacia "La Presentalla" con el detalle
+        // 3 ENVIAR A "EL ALFOLÍ" LA OFRENDA DIGITAL DEL SIERVO
+        // Se envía un mensaje OSC hacia "El Alfolí" con el detalle
         // de los datos del siervo en calidad de "ofrenda digital".
-        conexionPRESENTALLA.emit('message', '/' + __OSC_DIRECCION_PRESENTALLA__ + '/' + __OSC_MENSAJE_OFRENDAR__ + ' ' + 
-                                _posY);  // Se envía la posición del "scroll" vertical del siervo
+        conexionALFOLI.emit('message', '/' + __OSC_DIRECCION_ALFOLI__ + '/' + __OSC_MENSAJE_OFRENDAR__ + ' ' + 
+                           _posY);  // Se envía la posición del "scroll" vertical del siervo
     }
 
     /**

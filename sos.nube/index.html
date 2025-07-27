@@ -31,7 +31,7 @@
         );});
     
       socket.on('message', function(obj) {
-        Mensajes.recibir(obj);
+        Mensajes.recibir(obj, true);
         console.log(obj);
       });
     </script>

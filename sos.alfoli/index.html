@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <title>%VITE_PANTALLA_PRESENTALLA_NOMBRE%</title>
+    <title>%VITE_PANTALLA_ALFOLI_NOMBRE%</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="stylesheet" href="/src/estilos/sos.presentalla.css">
+    <link rel="stylesheet" href="/src/estilos/sos.alfoli.css">
   </head>
   <body>
 
-    <!-- MENSAJERO (OSC) DE LA PANTALLA-PRESENTALLA                -->
-    <!-- Intermediario (web socket) entre la presentalla (pantalla -->
-    <!-- de ofrendas) y los siervos, responsable de canalizar las  -->
+    <!-- MENSAJERO (OSC) DE LA PANTALLA-ALFOLÍ                     -->
+    <!-- Intermediario (web socket) entre el alfolí (pantalla de   -->
+    <!-- las ofrendas) y los siervos, responsable de canalizar las -->
     <!-- ofrendas digitales de sus seguidores como mensajes OSC.   -->
     <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
-    <script src="http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%/socket.io/socket.io.js"></script>
+    <script src="http://%VITE_MENSAJERO_ALFOLI_SERVIDOR%:%VITE_MENSAJERO_ALFOLI_PUERTO_WEB%/socket.io/socket.io.js"></script>
     
     <script>
-       var socket = io('http://%VITE_MENSAJERO_PRESENTALLA_SERVIDOR%:%VITE_MENSAJERO_PRESENTALLA_PUERTO_WEB%');
+       var socket = io('http://%VITE_MENSAJERO_ALFOLI_SERVIDOR%:%VITE_MENSAJERO_ALFOLI_PUERTO_WEB%');
        socket.on('connect', function() {
         socket.emit('config',
-            {server: {port: %VITE_PANTALLA_PRESENTALLA_PUERTO_OSC%,
-                     host: '%VITE_PANTALLA_PRESENTALLA_SERVIDOR%'
+            {server: {port: %VITE_PANTALLA_ALFOLI_PUERTO_OSC%,
+                     host: '%VITE_PANTALLA_ALFOLI_SERVIDOR%'
              },
              client: {port: 9999,
                      host: '127.0.0.1'
