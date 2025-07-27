@@ -23,21 +23,23 @@ La pantalla es la creencia fundacional de la obra. “La Nube” es una pantalla
 # La Canalización Divina
 La comunicación entre las pantallas (páginas web) ocurre mediante el intercambio de mensajes OSC (*Open Sound Control*) basado, a su vez, en el protocolo UDP (*User Datagram Protocol*) y que tienen lugar gracias a la intervención mediadora de dos "*Web Sockets*" que permiten, por un lado, la interacción entre el seguidor/siervo y su objeto de veneración ("La Nube") y, por otro lado, la recaudación encubierta de los datos personales del celular como ofrendas digitales incondicionales.
 
-- **WEB SOCKET 1 - "El Arrobamiento" (puerto 8081)**: responsable del vínculo directo entre "La Nube" y el seguidor/siervo. Mediante recompensas obscenas, se insta al seguidor a realizar un "*scroll* infinito" en su propia pantalla táctil como acto de obnubilación y arrobamiento celestial.
-- **WEB SOCKET 2 - "La Ofrenda" (puerto 8091)**: responsable de extraer, recolectar y analizar furtivamente los datos del celular del seguidor/siervo (sus ofrendas digitales) para procesarlos y presentarlos en la pantalla de "El Alfolí" como evidencia del acto de renuncia y entrega divina.
+- **WEB SOCKET #1 - "El Arrobamiento" (puerto 8081)**: responsable del vínculo directo entre "La Nube" y el seguidor/siervo. Mediante recompensas obscenas, se insta al seguidor a realizar un "*scroll* infinito" en su propia pantalla táctil como acto de obnubilación y arrobamiento celestial.
+- **WEB SOCKET #2 - "Las Ofrendas" (puerto 8091)**: responsable de extraer, recolectar y analizar furtivamente los datos del celular del seguidor/siervo (sus ofrendas digitales) para procesarlos y presentarlos en la pantalla de "El Alfolí" como evidencia del acto de renuncia y entrega divina.
 
 ![Diagrama de "La Obra"](imagineria/SOS-la-obra.png)
 
 # Detalles de la Tecnofanía
-"La Obra" está constituida por seis módulos (tres de ellos son las pantallas antes mencionadas). A continuación se describe en detalle la función de cada uno de ellos: tres pantallas y un módulo responsable de la conexión (mediante *web sockets*) y de la mensajería inter-pantalla (a través del protocolo OSC) que, por un lado, estimula el "arrobamiento" de los seguidores durante su veneración a "La Nube" y, por otro lado, encubre el acto de extracción sus "ofrendas digitales".
+"La Obra" está constituida por seis módulos (tres de ellos son las pantallas antes mencionadas). A continuación se describe en detalle la función de cada uno de ellos: 
+
 1. **MÓDULO NUBE (puerto 3330)**: alojado dentro de la carpeta `sos.nube`, almacena las escrituras sagradas (instrucciones en Processing y GLSL) que dan forma a la pantalla principal de "La Nube" que se proyecta en el recinto.
-2. **MÓDULO ALFOLI (puerto 3331)**, disponible dentro de la carpeta `sos.alfoli`, codifica los comandos que, de manera furtiva, contabilizan la colecta de las ofrendas digitales para monitorearlas desde la pantalla opuesta a la principal, proyectada con la forma de una caja de ofrendas.
+2. **MÓDULO ALFOLI (puerto 3331)**, disponible dentro de la carpeta `sos.alfoli`, codifica los comandos que, de manera furtiva, contabilizan la colecta de las ofrendas digitales para monitorearlas desde la pantalla opuesta a la principal, proyectada con la forma de un cofre de ofrendas.
 3. **MÓDULO SIERVO (puerto 3332)**: ubicado en la carpeta `sos.siervo`, contiene el código desarrollado para la pantalla del seguidor que se manifiesta como una aplicación móvil con un *feed* infinito de recompensa eterna para su usuario.
 4. **MÓDULO MENSAJERO** conformado por dos conectores (*web sockets*) alojados en la carpeta `sos.mensajero` que actuán como intermediarios, posibilitando la conexión inter-pantalla a través de mensajería OSC.
   - **Mensajería del "Arrobamiento" [web socket / puerto 8081]** para conectar al siervo con "La Nube" durante el acto de arrobamiento. Los mensajes OSC son transmitidos al **puerto 3333**.
-  - **Mensajería de las "Ofrendas" [web socket / puerto 8091]** para extraer del siervo sus ofrendas digitales y contabilizarlas discretamente en la pantalla separada con la forma de un alfolí. Los mensajes OSC son reencaminados al **puerto 3334**.
-5. **MÓDULO CONFIG**: dentro de la carpeta `sos.config`, define parámetros generales utilizados por los restantes módulos como, por ejemplo, los números de IPs y los números de puerto a utilizar por las pantallas y el mensajero.
-6. **MÓDULO SOCORRO**: disponible en la carpeta `sos.socorro`, brinda una serie de funciones para asistir al programador en apuros en la creación de obras para pantallas e instalaciones. Básicamente, este módulo constituye un paquete independiente para encapsular y simplificar el acceso a las librerías para generación de gráficos como Three.js y p5js.
+  - **Mensajería de las "Ofrendas" [web socket / puerto 8091]** para extraer del siervo sus ofrendas digitales y contabilizarlas discretamente en la pantalla separada con la forma de un "alfolí". Los mensajes OSC son reencaminados al **puerto 3334**.
+5. **MÓDULO CONFIG**: dentro de la carpeta `sos.config`, define los parámetros generales utilizados por los restantes módulos como, por ejemplo, los números de IPs y los números de puerto a ser ocupados por las pantallas y por los componentes del mensajero.
+6. **MÓDULO SOCORRO**: disponible en la carpeta `sos.socorro`, brinda una serie de funciones para asistir al programador en apuros en la creación de obras para pantallas e instalaciones. Básicamente, este módulo constituye un paquete independiente (creado con `npm`) para encapsular y unificar el acceso a las librerías para la generación de gráficos como **Three.js** y **p5js**.
+
 
 # Instalación
 El proyecto utiliza el entorno de ejecución de código JavaScript *open-source* **[nodejs](https://nodejs.org/)** junto con el software para la administración de paquetes de código **[npm](https://docs.npmjs.com/about-npm)**, que permite llevar registro y compartir paquetes de aplicaciones. También se emplea el software **[Vite](https://vite.dev/)** como herramienta de desarrollo.
@@ -60,10 +62,11 @@ La instalación de los módulos requeridos para la ceremonia de "La Obra" puede 
 
 ### Configuración de IPs y puertos
 En caso de realizar una instalación en múltiples equipos es preciso recordar que el módulo de configuración (**CONFIG**) debe estar presente en cada uno de ellos ya que contiene la definición de los parámetros generales. Antes de proseguir, se debe editar el archivo `.env` del módulo de configuración para definir los IPs de los equipos donde se realizó la instalación. No es necesario modificar la información vinculada a los puertos.
-> **NOTA**: todos los equipos deben estar conectados a la misma red wifi para que la mensajería OSC funcione.
+> **NOTA**: todos los equipos deben estar conectados a la misma red wifi para que la mensajería OSC funcione correctamente.
 
 ### Instalación de paquetes y dependencias
-Para instalar los paquetes y las dependencias de los módulos de "La Obra", moverse dentro de cada subcarpeta y ejecutar el comando `npm i` en cada una de ellas. En caso de realizar una instalación en múltiples equipos sólo es necesario instalar, en cada uno de ellos, los módulos que se vayan a utilizar, como explica el diagrama más arriba. Los módulos que se deben instalar son los siguientes cuatro:
+Para instalar los paquetes y las dependencias de los módulos de "La Obra", moverse dentro de cada subcarpeta y ejecutar el comando `npm i` en cada una de ellas. En caso de realizar una instalación en múltiples equipos sólo es necesario instalar en cada uno de ellos los módulos que se vayan a utilizar, como explica el diagrama más arriba. Los módulos que requieren instalación son los siguientes cuatro:
+
 ```sh
 $ cd sos.nube
 $ npm i
