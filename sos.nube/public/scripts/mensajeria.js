@@ -58,6 +58,8 @@ var Mensajes = (() => {
     }
     
     
-    return {recibir, recuperar, recuperarClasificados};
+    return {recibir, 
+           recuperar, 
+           recuperarClasificados};
 })();
 
