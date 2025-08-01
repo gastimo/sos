@@ -24,7 +24,7 @@ function Feed(S, contenedor) {
     const _recompensas   = [];
     const _incentivos    = [];
     const _reinicio      = Reinicio();
-    const _imagenObscena = __IMAGENES_INCENTIVOS__[Math.floor(S.O.S.azar(0, __IMAGENES_INCENTIVOS__.length))];
+    const _imagenObscena = __IMAGENES_INCENTIVOS__[Math.floor(S.O.S.aleatorio(0, __IMAGENES_INCENTIVOS__.length))];
 
     // CREACIÓN DE INCENTIVOS
     // Definición de los incentivos: "imágenes-cebos" que incitan
