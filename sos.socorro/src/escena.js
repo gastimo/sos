@@ -181,6 +181,9 @@ function Escena(sos) {
                 else if (valor.hasOwnProperty('x') && valor.hasOwnProperty('y')) {
                     _p5Shader.setUniform(nombre, [valor.x, valor.y]);
                 }
+                else if (valor.hasOwnProperty('contenido')) {
+                    _p5Shader.setUniform(nombre, valor.contenido());
+                }
                 else {
                     _p5Shader.setUniform(nombre, valor);
                 }
