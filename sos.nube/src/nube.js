@@ -34,12 +34,12 @@ function Nube(S) {
     const DISTANCIA_MAX        = 99999999;
     
     // Parametrización de indicadores para atracción y repulsión
-    const MARGEN_REBOTE        = 0.041;         // Margen desde los bordes donde se empieza a repeler (rebote)
+    const MARGEN_REBOTE        = 0.038;         // Margen desde los bordes donde se empieza a repeler (rebote)
     const INTENSIDAD_REBOTE    = 0.003;         // Fuerza del rebote contra los bordes
     const INTENSIDAD_ATRACCION = 0.000016;      // Fuerza de atracción al orbital más cercano
-    const INTENSIDAD_REPULSION = -0.0000000009; // Fuerza de respulsión con el seguidor más próximo
+    const INTENSIDAD_REPULSION = 0.000002;      // Fuerza de respulsión con el seguidor más próximo
     const VEL_MAXIMA_REPOSO    = 0.00021;       // Velocidad máxima en estado de reposo
-    const VEL_MAXIMA_ACTIVIDAD = 0.31;          // Velocidad máxima en estado de actividad
+    const VEL_MAXIMA_ACTIVIDAD = 0.48;          // Velocidad máxima en estado de actividad
     const MIN_ORBITAL_VEL      = 0.0007;        // Velocidad mínima para los orbitales
     const MAX_ORBITAL_VEL      = 0.0011;        // Velocidad máxima para los orbitales
     
@@ -68,13 +68,12 @@ function Nube(S) {
         function revelar(S, anchoPantalla, altoPantalla) {
             let _posX = _ajustar(_orb.posicion().x, anchoPantalla, anchoPantalla/2);
             let _posY = _ajustar(_orb.posicion().y, altoPantalla,  altoPantalla/2);
-            S.O.S.P5.fill(255);
+            S.O.S.P5.fill(255, 255, 0);
             S.O.S.P5.noStroke();
             S.O.S.P5.circle(_posX, _posY, 41);
         }
         
-        return S.O.S.revelar({revelar},
-                            _orb);
+        return S.O.S.revelar({revelar}, _orb);
     }
     
 
@@ -95,6 +94,7 @@ function Nube(S) {
      */
     function _iniciar() {
         let _fragmentShader;
+        let _imagenPrueba;
         const _escenificador = S.O.S.crearEscenaP5();
 
         // 1. CARGA (PRELOAD)
@@ -102,7 +102,7 @@ function Nube(S) {
         // utilizada para cargar los archivos necesarios.
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         _escenificador.alCargar((S) => {
-            _fragmentShader = S.O.S.cargarShader('/shaders/la_nube_draft.frag');
+            _fragmentShader = S.O.S.cargarShader('/shaders/pantalla-nube.frag');
         });
 
         // 2. COMIENZO (SETUP)
@@ -126,6 +126,7 @@ function Nube(S) {
             S.O.S.uniform("u_rotacion", 3.2);
             S.O.S.uniform("u_velocidad", 0.3);
             S.O.S.uniform("u_zoom", 3.0);
+            S.O.S.uniform("u_seguidores", 0);
         });
         
         // 3. DESPLIEGUE (DRAW)
@@ -155,12 +156,14 @@ function Nube(S) {
             // En este punto se actualizan las posiciones de los seguidores
             // y se genera la imagen conteniendo de manera cifrada (como
             // información de píxeles) las coordenadas que requiere el shader.
-            _desplazarSeguidores(S);
+            let _trayectos = _desplazarSeguidores(S);
             
             // ACTUALIZACIÓN DE VARIABLES UNIFORM
             // Se modifica el valor de los "uniform" que usa el 
             // shader principal de la nube para la representación.
-
+            S.O.S.uniform("u_seguidores", _trayectos.cantidad);
+            S.O.S.uniform("u_imagenSeguidores", _trayectos.imagen);
+                          
             // DESPLIEGUE DE LA NUBE Y SUS SEGUIDORES (SHADER)
             // Se invoca al método que despliega la gŕafica principal
             // de "La Nube" y sus seguidores (el render del shader).
@@ -275,8 +278,10 @@ function Nube(S) {
     function _desplazarSeguidores(S) {
         const _seg = [];
         
+        // FLOTACIÓN DE LOS SEGUIDORES EN PANTALLA
         // Primero se recorren los seguidores para determinar las fuerzas
         // de atracción y repulsión que los hacen flotar en la escena.
+        // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         for (const _id in _seguidores) {
             if (_seguidores.hasOwnProperty(_id)) {
                 let _seguidor = _seguidores[_id];
@@ -295,7 +300,7 @@ function Nube(S) {
                 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
                 if (_seguidor[SEGUIDOR]) {
                     let _repulsion = _seguidor[SEGUIDOR].direccion(_seguidor);
-                    //_seguidor.aceleracion(_repulsion.x * INTENSIDAD_REPULSION, _repulsion.y * INTENSIDAD_REPULSION);
+                    _seguidor.aceleracion(_repulsion.x * INTENSIDAD_REPULSION, _repulsion.y * INTENSIDAD_REPULSION);
                 }
                 
                 // 3. REBOTE DEL SEGUIDOR CONTRA LOS BORDES
@@ -321,22 +326,31 @@ function Nube(S) {
             }
         }
         
-        // Finalmente, se actualizan las posiciones de cada seguidor
-        for (let i = 0; i < _seg.length; i++) {
-            let _vel = _seg[i].velocidad();
-            let _acel = _seg[i].aceleracion();
-            let _enReposo = _seg[i].enReposo();
-            let _mag = _seg[i].magnitud();
-            _seg[i].velocidadMaxima(_enReposo ? VEL_MAXIMA_REPOSO : VEL_MAXIMA_ACTIVIDAD);
-            if (_enReposo)
-                _seg[i].desacelerar();
-            else {
-                _seg[i].restablecer();
-                _seg[i].aceleracion(_acel.x + (_acel.x * S.O.S.aleatorio(2.8, 3.2, true) * _mag / 48),
-                                   _acel.y + (_acel.y * S.O.S.aleatorio(2.8, 3.2, true) * _mag / 48));
+        // ACTUALIZACIÓN DE TRAYECTORIAS
+        // Con la información antes calculada, se actualizan las posiciones de los seguidores
+        // en pantalla. Se realizan también ajustes para producir aceleración o desaaceleración.
+        // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+        let _imagenSeguidores = null;
+        if (_seg.length > 0) {
+            _imagenSeguidores = S.O.S.P5.createImage(_seg.length, 1);
+            _imagenSeguidores.loadPixels();
+            for (let i = 0; i < _seg.length; i++) {
+                let _acel = _seg[i].aceleracion();
+                _seg[i].velocidadMaxima(_seg[i].enReposo() ? VEL_MAXIMA_REPOSO : VEL_MAXIMA_ACTIVIDAD);
+                if (_seg[i].enReposo())
+                    _seg[i].desacelerar();
+                else {
+                    _seg[i].restablecer();
+                    _seg[i].aceleracion(_acel.x + (_acel.x * S.O.S.aleatorio(2.8, 3.2, true) * _seg[i].magnitud() / 44),
+                                       _acel.y + (_acel.y * S.O.S.aleatorio(2.8, 3.2, true) * _seg[i].magnitud() / 44));
+                }
+                _seg[i].actualizar();
+                let _pos = _seg[i].posicion();
+                _imagenSeguidores.set(i, 0, [_pos.x * 255, _pos.y * 255, _seg[i].magnitud() / S.O.S.alto() / 2 * 255, 255]);
             }
-            _seg[i].actualizar();
+            _imagenSeguidores.updatePixels();
         }
+        return {cantidad: _seg.length, imagen: _imagenSeguidores};
     }
     
     /**
