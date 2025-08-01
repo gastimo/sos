@@ -155,7 +155,14 @@ const Siervo = () => {
             return {};
         }
     }
+    
    
+// =====================================================================
+// 
+//  FUNCIONES AUXILIADORAS DE USO GENERAL
+//  
+// =====================================================================
+    
     /**
      * mapear
      * Función de ayuda para remapear el valor de un número
@@ -167,18 +174,25 @@ const Siervo = () => {
     }
     
     /**
-     * azar
+     * aleatorio
      * Devuelve un número al azar (float) mayor o igual al mínimo 
      * especificado y menor que el máximo. Si estos parámetros no 
-     * son indicados, retorna un número aleatorio entre 0 y 1.
+     * son definidos, retorna un número aleatorio entre 0 y 1.
+     * El tercer parámetro indica, además, si el signo del número
+     * resultante también debe ser aleatorio.
      */
-    function azar(minimo, maximo) {
+    function aleatorio(minimo, maximo, signoAleatorio = false) {
+        let numero = 0;
         if (minimo === undefined || maximo === undefined) {
-            return Math.random();
+            numero = Math.random();
         }
         else {
-            return Math.random() * (maximo - minimo) + minimo;
+            numero = Math.random() * (maximo - minimo) + minimo;
         }
+        if (signoAleatorio) {
+            numero *= Math.sign(aleatorio(-1, 1, false)) ?? 1;
+        }
+        return numero;
     }
     
     
@@ -315,14 +329,14 @@ const Siervo = () => {
     
     
     // ===============================================================
-    // ===> Se exponen únicamente las funciones públicas del siervo
+    // ==> Se exponen únicamente las funciones públicas del siervo
     // ==> ("Revealing Module Pattern")
     // ===============================================================
     return {socorrista,
             obtenerClave,
             revelar,
             mapear,
-            azar,
+            aleatorio,
             crearEscena,
             crearEscenaP5
            };

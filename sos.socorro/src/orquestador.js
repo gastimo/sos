@@ -6,6 +6,7 @@
  * =============================================================================
  */
 import CONFIG from './config';
+import VariadorDeValores from './variador.js';
 
 
 /**
@@ -136,6 +137,35 @@ function Orquestador(sos, contenedor) {
     }
     
     
+    // ==========================================================
+    // 
+    //  DEFINICIÓN DE LA FUNCIÓN AUXILIADORA
+    //  
+    // ==========================================================
+    
+    /**
+     * Auxiliadora
+     * Función con rutinas de auxilio de uso general.
+     */
+    function Auxiliadora() {
+
+        function recuentoDeCuadros () {
+            return _processing ? S.O.S.P5.frameCount : _conteoDeCuadros();
+        }
+
+        function Variador(valorIni, valorFin, cuadrosDuracion, cuadrosRetardo) {
+            const _v = VariadorDeValores(S, valorIni, valorFin, cuadrosDuracion, cuadrosRetardo);
+            if (processing) 
+                _v.recuentoDeCuadros(() => {return S.O.S.P5.frameCount;});
+            else
+                _v.recuentoDeCuadros(() => {return _conteoDeCuadros();});
+            return _v;
+        }
+
+        return {recuentoDeCuadros,
+                Variador};
+    }
+    
     
 // ==============================================================
 // 
@@ -159,10 +189,7 @@ function Orquestador(sos, contenedor) {
         if (S.O.S.hasOwnProperty('P5')) {
             _escena.asociar('P5', S.O.S.P5);
         }
-        S.O.S.conteoDeCuadros = () => {
-            return _processing ? S.O.S.P5.frameCount : _conteoDeCuadros();
-        };
-        S.O.S.revelar(S.O.S, Cargador(), escena);
+        S.O.S.revelar(S.O.S, Auxiliadora(), Cargador(), escena);
     }  
     
     /**
