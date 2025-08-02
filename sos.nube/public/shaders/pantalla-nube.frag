@@ -18,8 +18,8 @@ uniform sampler2D u_imagenSeguidores;
 #define COLOR_OSCURO      vec3(0.0, 0.0, 0.0)
 
 // Paradas para el gradiente de colores
-#define GRAD_PASO1 0.27
-#define GRAD_PASO2 0.49
+#define GRAD_PASO1 0.25
+#define GRAD_PASO2 0.48
 #define GRAD_PASO3 0.62
 
 // Número máximo de seguidores simultáneos

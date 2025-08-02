@@ -7,6 +7,7 @@
  */
 import Seguidor from './seguidor.js';
 import Particula from './particula.js';
+import Acceso from './acceso.js';
 
 
 /**
@@ -24,7 +25,11 @@ import Particula from './particula.js';
 function Nube(S) {
     const _orbitales = [];
     let _seguidores  = {};
+    let _accesoQR;
     _iniciar();
+    
+    // Proporción de la imagen del código QR
+    const QR_PROPORCION        = 0.26;
 
     // Parámetros de uso privado de "La Nube"
     const ORBITAL              = "ORBITAL";
@@ -95,7 +100,7 @@ function Nube(S) {
      */
     function _iniciar() {
         let _fragmentShader;
-        let _imagenPrueba;
+        let _imagenQR;
         const _escenificador = S.O.S.crearEscenaP5();
 
         // 1. CARGA (PRELOAD)
@@ -104,6 +109,7 @@ function Nube(S) {
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         _escenificador.alCargar((S) => {
             _fragmentShader = S.O.S.cargarShader('/shaders/pantalla-nube.frag');
+            _imagenQR = S.O.S.cargarTextura2D('/imagenes/qr/acceso-QR-nube.png');
         });
 
         // 2. COMIENZO (SETUP)
@@ -111,10 +117,12 @@ function Nube(S) {
         // antes de iniciar el bucle de representación de la escena.
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         _escenificador.alComenzar((S) => {
+            // Preparar el código QR para conectarse a "La Nube"
+            _accesoQR = Acceso(S, _imagenQR, QR_PROPORCION);
+            
             // Definición e inicialización de los orbitales
-            for (let i = 0; i < __CANTIDAD_ORBITALES__; i++) {
+            for (let i = 0; i < __CANTIDAD_ORBITALES__; i++)
                 _orbitales[i] = Orbital(S);
-            }
             
             // Asociación del shader para la representación
             S.O.S.fragmentShader(_fragmentShader);
@@ -173,9 +181,14 @@ function Nube(S) {
             S.O.S.desplegar();
             
             // DESPLIEGUE DE INFORMACIÓN EXTRA DE SEGUIDORES (P5)
-            // Finalmente, se terminan de dibujar, con Processing, los datos
+            // Luego, se terminan de dibujar, con Processing, los datos
             // adicionales que deben aparecer por encima del shader.
             _desplegarSeguidores(S);
+            
+            // DESPLIEGUE DEL CÓDIGO QR PARA ACCESO
+            // Por último, se muestra el código QR que permite que los visitantes
+            // se conecten con "La Nube" y se conviertan en seguidores.
+            _accesoQR.desplegar(S.O.S.ancho(), S.O.S.alto());
         });
     }
     
@@ -196,6 +209,7 @@ function Nube(S) {
                     _nuevoSeguidor.rebotar(true);
                     _nuevoSeguidor[DESPLAZAMIENTO] = 0.01;
                     _seguidores[identificadorSeguidor] = _nuevoSeguidor;
+                    _accesoQR.esconder();
                 }
                 
                 // Se transfieren los mensajes recibidos para procesarlos más tarde
@@ -384,7 +398,6 @@ function Nube(S) {
         const _altoPantalla  = S.O.S.alto();
         
         S.O.S.P5.push();
-        
         /*
         // Desplegar los orbitales
         for (let i = 0; i < _orbitales.length; i++) {
@@ -405,7 +418,6 @@ function Nube(S) {
             }
         }
         */
-        
         S.O.S.P5.pop();
     }
     
