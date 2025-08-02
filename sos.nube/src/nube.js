@@ -5,9 +5,9 @@
  * 
  * =============================================================================
  */
+import Acceso from './acceso.js';
 import Seguidor from './seguidor.js';
 import Particula from './particula.js';
-import Acceso from './acceso.js';
 
 
 /**
@@ -164,15 +164,17 @@ function Nube(S) {
 
             // SEGUNDA PASADA POR LOS SEGUIDORES
             // En este punto se actualizan las posiciones de los seguidores
-            // y se genera la imagen conteniendo de manera cifrada (como
-            // información de píxeles) las coordenadas que requiere el shader.
+            // y se obtienen los valores de las variables "uniforms" que se
+            // deben pasar al "shader". Para la posición de cada seguidor se
+            // utiliza una imagen que "encripta" en cada uno de sus píxeles la
+            // coordenada <x,y> de la posición de cada seguidor y su tamaño.
             let _trayectos = _desplazarSeguidores(S);
             
             // ACTUALIZACIÓN DE VARIABLES UNIFORM
             // Se modifica el valor de los "uniform" que usa el 
             // shader principal de la nube para la representación.
-            S.O.S.uniform("u_intensidadFondo", _trayectos.intesidadCielo);
-            S.O.S.uniform("u_seguidores", _trayectos.cantidad);
+            S.O.S.uniform("u_intensidadFondo",  _trayectos.intesidadCielo);
+            S.O.S.uniform("u_seguidores",       _trayectos.cantidad);
             S.O.S.uniform("u_imagenSeguidores", _trayectos.imagen);
                           
             // DESPLIEGUE DE LA NUBE Y SUS SEGUIDORES (SHADER)
@@ -427,6 +429,7 @@ function Nube(S) {
      * Dibuja al seguidor sobre el lienzo
      */
     function _mostrarSeguidor(S, seguidor, x, y) {
+        // Mostrar la línea de conexión con el orbital más cercano
         if (seguidor[ORBITAL]) {
             const anchoPantalla = S.O.S.ancho();
             const altoPantalla  = S.O.S.alto();
@@ -436,7 +439,8 @@ function Nube(S) {
             S.O.S.P5.stroke(255, 0, 0);
             S.O.S.P5.line(x, y, _posX, _posY);
         }
-          
+        
+        // Mostrar la línea de conexión con el seguidor más próximo
         if (seguidor[SEGUIDOR]) {
             const anchoPantalla = S.O.S.ancho();
             const altoPantalla  = S.O.S.alto();
@@ -448,7 +452,7 @@ function Nube(S) {
         }
 
         // Dibujar al seguidor
-        S.O.S.P5.fill(0);
+        S.O.S.P5.fill(255, 0, 0);
         S.O.S.P5.noStroke();
         S.O.S.P5.circle(x, y, seguidor.magnitud());
     }

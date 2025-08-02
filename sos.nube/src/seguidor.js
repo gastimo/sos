@@ -100,30 +100,33 @@ function Seguidor(S, identificador) {
             } 
         }
         
-        // REGISTRO DE ACTIVIDA E INTERACCIÓN
+        // REGISTRO DE ACTIVIDAD E INTERACCIÓN
         // Una vez procesados los mensajes se registra efectivamente la actividad
         // y la interacción del siervo en su pantalla táctil, esto es:
         //  - ACTIVIDAD   : Si se recibió algún mensaje desde el siervo (cualquiera)
         //  - INTERACCIÓN : Si se recibió un mensaje de arrobamiento (scrolling)
         // En cualquiera de los dos casos, se deja registro interno en el seguidor.
+        // El grado de interacción del siervo es medido como la "Magnitud".
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         if (_registraActividad) {
             _ultimaActividad = new Date();
         }
         
-        // El "Registro de la Interacción" indica la posición actual del "scroll" del 
+        // El registro de la interacción indica la posición actual del "scroll" del 
         // siervo en su pantalla. Por otro lado, la "Magnitud" representa la intensidad
         // del "scroll", es decir, cuánto desplazamiento hizo desde el último registro.
         // Si dejase de moverse en su pantalla, la magnitud vuelve a su valor por defecto.
         if (_apertura) {
             _apertura = false;
-            _actividad = S.O.S.Variador(1, 1); 
-            _actividad.desvincular();
+            _actividad = S.O.S.Variador(1, 1);  // Variador para registrar el estado actual
+            _actividad.desvincular();           // Desvincular el estado de la magnitud (por cierre)
+            // Se inicia el "variador" para llevar la "Magnitud" a su valor por defecto
             _magnitud.reiniciar(0, MAGNITUD_POR_DEFECTO, DURACION_TRANSICION_CONEXION);
         }
         else if (_registraInteracción) {
-            _actividad = S.O.S.Variador(1, 1); 
-            _actividad.desvincular();
+            _actividad = S.O.S.Variador(1, 1);  // Variador para registrar el estado actual
+            _actividad.desvincular();           // Desvincular el estado de la magnitud (por cierre)
+            // Se reinicia el "variador" para llevar la "Magnitud" a su nuevo nivel calculado
             let _nuevaMagnitud = Math.abs(_ultimoValorRegistrado - _registroPrevio) * 4.4;
             _nuevaMagnitud = Math.min(_nuevaMagnitud, MAGNITUD_MAXIMA_A_INCREMENTAR);
             _magnitud.reiniciar(MAGNITUD_POR_DEFECTO, Math.max(_nuevaMagnitud, MAGNITUD_POR_DEFECTO), 
@@ -135,6 +138,11 @@ function Seguidor(S, identificador) {
      * magnitud
      * Retorna un valor que representa la intensidad de la actividad
      * del siervo en su pantalla (cuanto "scrolling" realiza). 
+     * La "Magnitud" se incremena y decrementa gradualmente mediante
+     * un "variador" para no producir saltos bruscos.
+     * Después de un tiempo sin recibir mensajes que modifiquen la 
+     * "Magnitud", el "variador" es automáticamente reiniciado para 
+     * devolver la "Magnitud" a su nivel por defecto.
      */
     function magnitud() {
         let _mag = _magnitud.valor();
@@ -147,7 +155,8 @@ function Seguidor(S, identificador) {
     /**
      * enReposo
      * Indica si el seguidor no está actualmente interactuando
-     * con su pantalla táctil (realizando "scrolling").
+     * con su pantalla táctil (realizando "scrolling"). Esto se
+     * puede detectar al no haber cambios en la "Magnitud".
      */
     function enReposo() {
         return _magnitud.valor() <= MAGNITUD_POR_DEFECTO;
@@ -193,6 +202,14 @@ function Seguidor(S, identificador) {
      * desconectado
      * Indica si el seguidor se encuentra actualmente desconectado,
      * ya sea por desconexión explícita o por inactividad.
+     * Para determinar esto se verifican dos condiciones:
+     *  1. El tiempo tanscurrido desde la última actividad.
+     *  2. La recepción de un mensaje OSC de desconexión.
+     * Para llevar el registro del estado actual del seguidor se utiliza  
+     * un "variador" (en este caso, "_actividad") en lugar de una variable
+     * simple, dado que la desconexión implica una transición: cuando se 
+     * detecta la desconexión (por mensaje o por inactividad) se inicia
+     * el variador que decrementa gradualmente la "Magnitud" hasta cero.
      */
     function desconectado() {
         let _estadoActual = _actividad.valor();
@@ -212,8 +229,8 @@ function Seguidor(S, identificador) {
     
     /**
      * eliminar
-     * Funcion encargada de gestionar la forma en la que el 
-     * seguidor es removido de la lista de seguidores.
+     * Funcion encargada de gestionar las tareas necesarias post-remoción 
+     * del seguidor de la lista (en este punto el seguidor ya fue quitado).
      */
     function eliminar() {
         console.log(" ===> SEGUIDOR " + _identificador + " DESCONECTADO!");
@@ -222,9 +239,11 @@ function Seguidor(S, identificador) {
 
     /**
      * _cierre
-     * Define las variables para dar inicio a la transición
-     * para la desconexión donde la magnitud va siendo 
-     * reducida gradualmente.
+     * Define las variables para dar inicio a la transición de desconexión.
+     * Básicamente, el valor de la "Magnitud" es decrementado gradualmente
+     * mediante un "variador" que, a su vez, se lo vincula con el "variador"
+     * de la "Actividad". Cuando el variador de la "Magnitud" llegue a cero,
+     * se dispara el "variador" de actividad para ponerlo en "falso".
      */
     function _cierre() {
         _magnitud.reiniciar(_magnitud.valor(), 0, DURACION_TRANSICION_DESCONEXION);
