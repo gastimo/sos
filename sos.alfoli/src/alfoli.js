@@ -39,6 +39,7 @@ function Alfoli(S) {
      * de Processing (p5js 2.0).
      */
     function _iniciar() {
+        let _fragmentShader;
         const _escenificador = S.O.S.crearEscenaP5();
 
         // 1. CARGA (PRELOAD)
@@ -46,7 +47,7 @@ function Alfoli(S) {
         // utilizada para cargar los archivos necesarios.
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         _escenificador.alCargar((S) => {
-
+            _fragmentShader = S.O.S.cargarShader('/shaders/pantalla-alfoli.frag');
         });
 
         // 2. COMIENZO (SETUP)
@@ -54,6 +55,10 @@ function Alfoli(S) {
         // antes de iniciar el bucle de representación de la escena.
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         _escenificador.alComenzar((S) => {
+            S.O.S.fragmentShader(_fragmentShader);
+            S.O.S.uniformTiempo("u_time");
+            S.O.S.uniformResolucion("u_resolution");
+            S.O.S.uniformMouse("u_mouse");
         });
         
         // 3. DESPLIEGUE (DRAW)
@@ -67,6 +72,11 @@ function Alfoli(S) {
             // Antes que nada se deben realizar la colecta de las
             // nuevas ofrendas enviadas por los siervos "oferentes".
             _recolectarOfrendas(S);
+        
+            // DESPLIEGUE DE LA NUBE Y SUS SEGUIDORES (SHADER)
+            // Se invoca al método que despliega la gŕafica principal
+            // de "La Nube" y sus seguidores (el render del shader).
+            S.O.S.desplegar();            
             
             // SEGUNDO: CONTABILIZAR OFRENDAS
             // Por cada ofrenda recibida, se dispara una animación que
