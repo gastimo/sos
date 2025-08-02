@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="/src/estilos/sos.alfoli.css">
+    <script type="text/javascript" src="/scripts/mensajeria.js"></script>
   </head>
   <body>
 
@@ -30,11 +31,12 @@
         );});
     
       socket.on('message', function(obj) {
+        Mensajes.recibir(obj, true);
         console.log(obj);
       });
     </script>
       
     <script type="module" src="/src/pantalla.js"></script>
-        ¡El Ojo que todo lo ve!
+    
   </body>
 </html>

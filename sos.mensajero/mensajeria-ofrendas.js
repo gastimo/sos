@@ -19,10 +19,16 @@ const prepararMensaje = (socket, msj, dir, tipo) => {
     const _cuerpoMensaje   = _mensajeRecibido.slice( dir ? 0 : 1);
     const _direccionOSC    = dir ? ['/' + dir + '/' + tipo] : [_mensajeRecibido[0]];
     const _identificacion  = ["DESCONOCIDA"];
-    if (socket.hasOwnProperty("handshake") && socket.handshake.hasOwnProperty("address")) {
-      _identificacion[0] = socket.handshake.address;
+    const _userAgent       = ["DESCONOCIDO"];
+    if (socket.hasOwnProperty("handshake")) {
+      if (socket.handshake.hasOwnProperty("address")) {
+        _identificacion[0] = socket.handshake.address;
+      }
+      if (socket.handshake.hasOwnProperty("headers") && socket.handshake.headers.hasOwnProperty("user-agent")) {
+        _userAgent[0] = socket.handshake.headers["user-agent"];
+      }
     }
-    return [..._direccionOSC, ..._identificacion, ..._cuerpoMensaje];
+    return [..._direccionOSC, ..._identificacion, ..._cuerpoMensaje, ..._userAgent];
 };
 
 

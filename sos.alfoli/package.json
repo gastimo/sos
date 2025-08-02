@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Siervos del Obnubilante Scrolling (S.O.S.) - El Alfolí",
   "scripts": {
-    "start"   : "vite --config vite.config.js", 
-    "dev"     : "vite --config vite.config.js", 
-    "build"   : "vite build", 
-    "preview" : "vite preview"
+    "start": "vite --config vite.config.js",
+    "dev": "vite --config vite.config.js",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [
     "sos",
@@ -21,7 +21,8 @@
   "homepage": "https://github.com/gastimo/sos#readme",
   "dependencies": {
     "node-osc": "^1.2.0",
-    "socket.io": "^1.7.4"
+    "socket.io": "^1.7.4",
+    "socorro": "^0.0.37"
   },
   "devDependencies": {
     "vite": "^7.0.4"
