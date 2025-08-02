@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
       __OSC_MENSAJE_DESCONEXION__ : JSON.stringify(env.OSC_MENSAJE_DESCONEXION),
       __OSC_MENSAJE_ARROBAR__     : JSON.stringify(env.OSC_MENSAJE_ARROBAR),
       __OSC_MENSAJE_OFRENDAR__    : JSON.stringify(env.OSC_MENSAJE_OFRENDAR),
-      __CANTIDAD_ORBITALES__      : 3
+      __CANTIDAD_ORBITALES__      : 5
     },
     
     optimizeDeps: {

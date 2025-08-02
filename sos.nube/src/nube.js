@@ -22,8 +22,8 @@ import Particula from './particula.js';
  * animada de "La Nube" en la pantalla proyectada.
  */
 function Nube(S) {
-    let _seguidores  = {};
     const _orbitales = [];
+    let _seguidores  = {};
     _iniciar();
 
     // Parámetros de uso privado de "La Nube"
@@ -31,15 +31,16 @@ function Nube(S) {
     const ORBITAL_DIST         = "ORBITAL_DIST";
     const SEGUIDOR             = "SEGUIDOR";
     const SEGUIDOR_DIST        = "SEGUIDOR_DIST";
+    const DESPLAZAMIENTO       = "DESPLAZAMIENTO";
     const DISTANCIA_MAX        = 99999999;
     
     // Parametrización de indicadores para atracción y repulsión
     const MARGEN_REBOTE        = 0.038;         // Margen desde los bordes donde se empieza a repeler (rebote)
     const INTENSIDAD_REBOTE    = 0.003;         // Fuerza del rebote contra los bordes
-    const INTENSIDAD_ATRACCION = 0.000016;      // Fuerza de atracción al orbital más cercano
-    const INTENSIDAD_REPULSION = 0.000002;      // Fuerza de respulsión con el seguidor más próximo
+    const INTENSIDAD_ATRACCION = 0.000018;      // Fuerza de atracción al orbital más cercano
+    const INTENSIDAD_REPULSION = 0.000015;      // Fuerza de respulsión con el seguidor más próximo
     const VEL_MAXIMA_REPOSO    = 0.00021;       // Velocidad máxima en estado de reposo
-    const VEL_MAXIMA_ACTIVIDAD = 0.48;          // Velocidad máxima en estado de actividad
+    const VEL_MAXIMA_ACTIVIDAD = 0.49;          // Velocidad máxima en estado de actividad
     const MIN_ORBITAL_VEL      = 0.0007;        // Velocidad mínima para los orbitales
     const MAX_ORBITAL_VEL      = 0.0011;        // Velocidad máxima para los orbitales
     
@@ -120,6 +121,7 @@ function Nube(S) {
             S.O.S.uniformTiempo("u_time");
             S.O.S.uniformResolucion("u_resolution");
             S.O.S.uniformMouse("u_mouse");
+            S.O.S.uniform("u_intensidadFondo", 0);
             S.O.S.uniform("u_direccion", 0.1, 0.1);
             S.O.S.uniform("u_degrade", 0.6);
             S.O.S.uniform("u_volumen", 0.2);
@@ -161,6 +163,7 @@ function Nube(S) {
             // ACTUALIZACIÓN DE VARIABLES UNIFORM
             // Se modifica el valor de los "uniform" que usa el 
             // shader principal de la nube para la representación.
+            S.O.S.uniform("u_intensidadFondo", _trayectos.intesidadCielo);
             S.O.S.uniform("u_seguidores", _trayectos.cantidad);
             S.O.S.uniform("u_imagenSeguidores", _trayectos.imagen);
                           
@@ -191,6 +194,7 @@ function Nube(S) {
                     let _nuevoSeguidor = Seguidor(S, identificadorSeguidor);
                     _nuevoSeguidor.velocidadMaxima(VEL_MAXIMA_REPOSO);
                     _nuevoSeguidor.rebotar(true);
+                    _nuevoSeguidor[DESPLAZAMIENTO] = 0.01;
                     _seguidores[identificadorSeguidor] = _nuevoSeguidor;
                 }
                 
@@ -331,6 +335,8 @@ function Nube(S) {
         // en pantalla. Se realizan también ajustes para producir aceleración o desaaceleración.
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         let _imagenSeguidores = null;
+        let _magnitudTotal = 0;
+        let _intensidadColorCielo = 0;
         if (_seg.length > 0) {
             _imagenSeguidores = S.O.S.P5.createImage(_seg.length, 1);
             _imagenSeguidores.loadPixels();
@@ -344,13 +350,26 @@ function Nube(S) {
                     _seg[i].aceleracion(_acel.x + (_acel.x * S.O.S.aleatorio(2.8, 3.2, true) * _seg[i].magnitud() / 44),
                                        _acel.y + (_acel.y * S.O.S.aleatorio(2.8, 3.2, true) * _seg[i].magnitud() / 44));
                 }
+                // Actualización de las coordenadas del seguidor
                 _seg[i].actualizar();
+                
+                // Preparación de la información para enviar al "shader" de manera encriptada (en una imagen)
+                let _segMagnitud = _seg[i].magnitud() * 1.5;
+                _magnitudTotal += _segMagnitud;
                 let _pos = _seg[i].posicion();
-                _imagenSeguidores.set(i, 0, [_pos.x * 255, _pos.y * 255, _seg[i].magnitud() / S.O.S.alto() / 2 * 255, 255]);
+                if (_seg[i].enReposo()) {
+                    _seg[i][DESPLAZAMIENTO] += 0.021;
+                    _segMagnitud += _segMagnitud * S.O.S.P5.noise(_seg[i][DESPLAZAMIENTO]);
+                }
+                _imagenSeguidores.set(i, 0, [_pos.x * 255, _pos.y * 255, _segMagnitud / S.O.S.alto() / 2 * 255, 255]);
             }
+            // Se terminan de guardar los pixeles de la imagen con los datos encriptados
             _imagenSeguidores.updatePixels();
+            
+            // Finalmente, se calcula la intensidad del color del cielo
+            _intensidadColorCielo = S.O.S.mapear(_seg.length * _magnitudTotal, 0, 3000, 0, 1);
         }
-        return {cantidad: _seg.length, imagen: _imagenSeguidores};
+        return {cantidad: _seg.length, imagen: _imagenSeguidores, intesidadCielo: _intensidadColorCielo};
     }
     
     /**
@@ -366,6 +385,7 @@ function Nube(S) {
         
         S.O.S.P5.push();
         
+        /*
         // Desplegar los orbitales
         for (let i = 0; i < _orbitales.length; i++) {
             _orbitales[i].revelar(S, _anchoPantalla, _altoPantalla);
@@ -384,6 +404,7 @@ function Nube(S) {
                 _mostrarSeguidor(S, _seguidor, _posX - (_anchoPantalla/2), _posY - (_altoPantalla/2));
             }
         }
+        */
         
         S.O.S.P5.pop();
     }
