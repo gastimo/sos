@@ -7,6 +7,9 @@
  */
 import Oferente from './oferente.js';
 
+const ALFOLI_POS_X = 0.81;
+const ALFOLI_POS_Y = 0.306;
+
 
 /**
  * Alfoli
@@ -22,7 +25,28 @@ function Alfoli(S) {
     let _oferentes  = {};
     _iniciar();
     
-    
+
+    /**
+     * Recursos
+     * Se trata simplemente de una colección de recursos gráficos
+     * para construir las ventanas de las ofrendas. Este objeto
+     * es cargado una sóla vez al inicializar "El Alfolí" y luego
+     * es pasado como parámetro a los oferentes y a las ofrendas.
+     */
+    const Recursos = {
+        IMAGEN: {
+            marco      : null
+        },
+        FUENTE: {
+            encabezado : null,
+            titulo     : null,
+            texto      : null
+        },
+        GRAFICO: {
+            ventana    : null
+        }
+    };
+
     
 // ==============================================================
 // 
@@ -47,7 +71,11 @@ function Alfoli(S) {
         // utilizada para cargar los archivos necesarios.
         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
         _escenificador.alCargar((S) => {
-            _fragmentShader = S.O.S.cargarShader('/shaders/pantalla-alfoli.frag');
+            _fragmentShader            = S.O.S.cargarShader('/shaders/pantalla-alfoli.frag');
+            Recursos.IMAGEN.marco      = S.O.S.cargarTextura2D('/imagenes/ventana-OFRENDA.png');
+            Recursos.FUENTE.encabezado = S.O.S.cargarFuente('/fuentes/Jersey20-Regular.ttf');
+            Recursos.FUENTE.titulo     = S.O.S.cargarFuente('/fuentes/KodeMono-Bold.ttf');
+            Recursos.FUENTE.texto      = S.O.S.cargarFuente('/fuentes/KodeMono-Regular.ttf');
         });
 
         // 2. COMIENZO (SETUP)
@@ -59,6 +87,8 @@ function Alfoli(S) {
             S.O.S.uniformTiempo("u_time");
             S.O.S.uniformResolucion("u_resolution");
             S.O.S.uniformMouse("u_mouse");
+            let _imagenMarco = Recursos.IMAGEN.marco.contenido();
+            Recursos.GRAFICO.ventana = S.O.S.P5.createGraphics(_imagenMarco.width, _imagenMarco.height);
         });
         
         // 3. DESPLIEGUE (DRAW)
@@ -91,7 +121,7 @@ function Alfoli(S) {
      * _recolectarOfrendas
      * Recibe los mensajes de los oferentes enviados a través del protocolo OSC.
      * En respuesta, crea un registro de oferentes actualmente conectados a "La 
-     * Nube" y les asocia los mensajes recibidos para procesarlos luego.
+     * Nube" y crea sus ofrendas en caso de que hayan tenido actividad.
      */
     function _recolectarOfrendas(S) {
         let _mensajes = Mensajes.recuperarClasificados();
@@ -99,7 +129,7 @@ function Alfoli(S) {
             if (_mensajes.hasOwnProperty(identificadorOferente)) {                
                 // Se crea un nuevo oferente en caso de ser la primera vez
                 if (!_oferentes.hasOwnProperty(identificadorOferente)) {
-                    let _nuevoOferente = Oferente(S, identificadorOferente);
+                    let _nuevoOferente = Oferente(S, identificadorOferente, Recursos);
                     _oferentes[identificadorOferente] = _nuevoOferente;
                 }
                 // Se transfieren los mensajes recibidos para contabilizarlos luego
@@ -112,13 +142,32 @@ function Alfoli(S) {
     /**
      * _contabilizarOfrendas
      * Recorre la lista de oferentes para procesar sus últimos mensajes
-     * recibidos. Por cada nueva ofrenda, se dispara una animación que
-     * muestra cómo los datos son introducidos en "El Alfolí".
-     * Esta función también se ocupa de remover de la lista aquellos 
+     * recibidos. La función se encarga de remover de la lista aquellos 
      * oferentes que se hayan desconectado o lleven tiempo inactivos.
+     * Además, se ocupa de actualizar, desplegar y/o enviar a "El Alfolí"
+     * las ofrendas que estén en curso.
      */
     function _contabilizarOfrendas(S) {
-        
+        let _ofrnt = {};
+        for (const _id in _oferentes) {
+            if (_oferentes.hasOwnProperty(_id)) {
+                let _oferente = _oferentes[_id];
+            
+                // OFERENTE DESCONECTADO
+                // Se elimina al oferente de la lista
+                if (_oferente.desconectado()) {
+                    _oferente.eliminar();
+                }
+                
+                // OFERENTE ACTIVO
+                // Se procesan las ofrendas del oferente activo
+                else {
+                    _ofrnt[_id] = _oferente;
+                    _oferente.contabilizar(S.O.S.ancho(), S.O.S.alto(), ALFOLI_POS_X, ALFOLI_POS_Y);
+                }
+            }
+        }
+        _oferentes = _ofrnt;
     }
 }
 

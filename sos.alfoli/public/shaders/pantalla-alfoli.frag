@@ -139,9 +139,10 @@ void main(void)
     // NORMALIZACIÓN Y AJUSTE
     // Normalización de las coordinadas del pixel y ajuste de proporciones
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    vec2 pos = gl_FragCoord.xy/u_resolution - .5;
+    vec2 pos = gl_FragCoord.xy/u_resolution;
+    pos -= vec2(0.32, 0.);   // Se desplazan las coordenadas hacia la derecha
+    pos -= .5;
     pos.x *= u_resolution.x/u_resolution.y;
-    pos -= vec2(0.56, 0.);   // Se desplazan las coordenadas hacia la derecha
 
     // PARÁMETROS DE LA CÁMARA
     // La cámara se desplaza en el eje "X" y se retira hacia atrás en el eje "Z"

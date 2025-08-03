@@ -6,6 +6,7 @@
  * =============================================================================
  */
 import Particula from './particula.js';
+import Ofrenda from './ofrenda.js';
 
 
 /**
@@ -14,12 +15,12 @@ import Particula from './particula.js';
  * involuntaria (o no tanto) envía ofrendas digitales (sus
  * datos personales) para ser recolectados por "El Alfolí".
  */
-function Oferente(S, identificador) {
+function Oferente(S, identificador, recursos) {
     
     // Parámetros internos del oferente
     const TIEMPO_OCIOSO_MAXIMO            = 60 * 1000;  // En segundos
     const DURACION_TRANSICION_ACTIVIDAD   = 35;         // En cuadros
-    const DURACION_TRANSICION_INACTIVIDAD = 78;         // En cuadros
+    const DURACION_TRANSICION_INACTIVIDAD = 30;         // En cuadros
     const DURACION_TRANSICION_CONEXION    = 70;         // En cuadros
     const DURACION_TRANSICION_DESCONEXION = 83;         // En cuadros
     const DURACION_DESACELERACION         = 3;          // En cuadros
@@ -30,15 +31,17 @@ function Oferente(S, identificador) {
     // Definición de los componentes del oferente
     const _cuerpo = Particula(S);
     const _identificador = identificador;
-    let   _direccionIP;
-    let   _recaudador;
+    let   _ofrendasPrevias = [];
+    let   _ofrendaEnCurso;
     let   _apertura = false;
     let   _primerValorRegistrado;
     let   _ultimoValorRegistrado = 0;
     let   _ultimaActividad = new Date();
     let   _magnitud  = S.O.S.Variador(0, 0);
     let   _actividad = S.O.S.Variador(1, 1);
+    const Datos = {siervo: null, recaudador: null};
     _iniciar();
+    
     
     /**
      * _iniciar
@@ -48,7 +51,7 @@ function Oferente(S, identificador) {
         if (_identificador) {
             let _indice = _identificador.indexOf(":", 2);
             if (_indice >= 0) {
-                _direccionIP = _identificador.substring(_indice + 1);
+                Datos.siervo = _identificador.substring(_indice + 1);
             }
         }
     }
@@ -101,7 +104,7 @@ function Oferente(S, identificador) {
                 // EVENTO DE ENTREGA DE OFRENDA DIGITAL
                 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
                 else {
-                    _recaudador = msj[i][3];
+                    Datos.recaudador = msj[i][3];
                     if (_oscDireccion == SEPARADOR_MENSAJE_OSC + __OSC_DIRECCION_ALFOLI__ + 
                                         SEPARADOR_MENSAJE_OSC + __OSC_MENSAJE_OFRENDAR__) {
                         _ultimoValorRegistrado = _interaccion;
@@ -140,13 +143,57 @@ function Oferente(S, identificador) {
             _magnitud.reiniciar(0, MAGNITUD_POR_DEFECTO, DURACION_TRANSICION_CONEXION);
         }
         else if (_registraInteracción) {
+            // Actualización del estado
             _actividad = S.O.S.Variador(1, 1);  // Variador para registrar el estado actual
             _actividad.desvincular();           // Desvincular el estado de la magnitud (por cierre)
-            // Se reinicia el "variador" para llevar la "Magnitud" a su nuevo nivel calculado
+
+            // Actualización de la "Magnitud"
             let _nuevaMagnitud = Math.abs(_ultimoValorRegistrado - _registroPrevio) * 4.4;
             _nuevaMagnitud = Math.min(_nuevaMagnitud, MAGNITUD_MAXIMA_A_INCREMENTAR);
             _magnitud.reiniciar(MAGNITUD_POR_DEFECTO, Math.max(_nuevaMagnitud, MAGNITUD_POR_DEFECTO), 
                                DURACION_TRANSICION_ACTIVIDAD);
+            
+            // Actualización de la ofrenda
+            if (!_ofrendaEnCurso) {
+                _ofrendaEnCurso = Ofrenda(S, Datos, recursos);
+            }
+            else {
+                _ofrendaEnCurso.reiniciar();
+            }
+        }
+    }
+    
+    /**
+     * contabilizar
+     * Función principal del oferente, invocada en cada ciclo del bucle.
+     * Se ocupa de procesar las ofrendas creadas al momento de recibir 
+     * los mensajes. Esta función no crea nuevas ofrendas, simplemente
+     * se encarga de gestionar las ofrendas en curso para determinar si
+     * sus datos deben ser actualizados o si ya es momento de cerrarlas 
+     * y enviadas a "El Alfolí".
+     */
+    function contabilizar(ancho, alto, alfoliPosX, alfoliPosY) {
+        // Si hay una ofrenda en curso, pero el siervo se encuentra 
+        // en reposo, se verifica si no es el momento de cerrar la
+        // ofrenda y enviarla a "El Alfolí" para ser contabilizada.
+        if (enReposo() && _ofrendaEnCurso && !_ofrendaEnCurso.vigente()) {
+            _ofrendasPrevias.push(_ofrendaEnCurso);
+            _ofrendaEnCurso.enviar(alfoliPosX, alfoliPosY);  // Es enviada a "El Alfolí"
+            _ofrendaEnCurso = null;
+        }
+        
+        // Luego, se procesde a desplegar las ofrendas previas
+        // así también como la ofrenda que esté en curso.
+        let _op = [];
+        for (let i = 0; i < _ofrendasPrevias.length; i++) {
+            if (!_ofrendasPrevias[i].entregada()) {
+                _ofrendasPrevias[i].desplegar(ancho, alto);
+                _op.push(_ofrendasPrevias[i]);
+            }
+        }
+        _ofrendasPrevias = _op;
+        if (_ofrendaEnCurso) {
+            _ofrendaEnCurso.desplegar(ancho, alto);
         }
     }
     
@@ -175,7 +222,7 @@ function Oferente(S, identificador) {
      * puede detectar al no haber cambios en la "Magnitud".
      */
     function enReposo() {
-        return _magnitud.valor() <= MAGNITUD_POR_DEFECTO;
+        return magnitud() <= MAGNITUD_POR_DEFECTO;
     }
     
     /**
@@ -230,12 +277,12 @@ function Oferente(S, identificador) {
         _actividad.vincular(_magnitud);
     }
     
-    
     return S.O.S.revelar({mensajes,
                          magnitud,
                          enReposo,
                          desconectado,
-                         eliminar},
+                         eliminar,
+                         contabilizar},
                          _cuerpo);
 }
 
