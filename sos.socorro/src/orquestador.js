@@ -115,6 +115,19 @@ function Orquestador(sos, contenedor) {
                 return _imagen;
             }
         }
+        
+        function cargarFuente(archivo) {
+            if (!_utilizaP5) {
+                // No soportado por el momento
+                return Archivo(archivo, "");
+            }
+            else {
+                let _fuente = Archivo(archivo);
+                _archivos.push(_fuente);
+                _cargarFuenteP5(archivo, _fuente);
+                return _fuente;
+            }
+        }
 
         function cargaCompletada() {
             for (let i = 0; i < _archivos.length; i++) {
@@ -137,6 +150,12 @@ function Orquestador(sos, contenedor) {
             });
         }
         
+        async function _cargarFuenteP5(nombre, archivo) {
+            let fuente = await S.O.S.P5.loadFont(nombre, (font) => {
+                archivo.contenido(font);
+            });
+        }
+        
         function _inicializarGestorTHREE() {
             if (_gestorTHREE === undefined) {
                 _gestorTHREE = new S.O.S.THREE.LoadingManager();
@@ -148,7 +167,7 @@ function Orquestador(sos, contenedor) {
             }
         }
         
-        return {cargarShader, cargarTextura2D, cargaCompletada};
+        return {cargarShader, cargarTextura2D, cargarFuente, cargaCompletada};
     }
     
     
@@ -164,17 +183,12 @@ function Orquestador(sos, contenedor) {
      */
     function Auxiliadora() {
 
-        function recuentoDeCuadros () {
+        function recuentoDeCuadros() {
             return _utilizaP5 ? S.O.S.P5.frameCount : _conteoDeCuadros();
         }
 
         function Variador(valorIni, valorFin, cuadrosDuracion, cuadrosRetardo) {
-            const _v = VariadorDeValores(S, valorIni, valorFin, cuadrosDuracion, cuadrosRetardo);
-            if (processing) 
-                _v.recuentoDeCuadros(() => {return S.O.S.P5.frameCount;});
-            else
-                _v.recuentoDeCuadros(() => {return _conteoDeCuadros();});
-            return _v;
+            return VariadorDeValores(S, valorIni, valorFin, cuadrosDuracion, cuadrosRetardo, recuentoDeCuadros);
         }
 
         return {recuentoDeCuadros,

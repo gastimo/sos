@@ -14,8 +14,8 @@
  * la función esperará esa cantidad de cuadros antes de comenzar la variación.
  * Por el momento, la variación es únicamente "lineal".
  */
-function Variador(S, valorIni, valorFin, cuadrosDuracion, cuadrosRetardo) {
-    let _recuentoDeCuadros = () => {return 0;};
+function Variador(S, valorIni, valorFin, cuadrosDuracion, cuadrosRetardo, contadorDeCuadros) {
+    let _recuentoDeCuadros = contadorDeCuadros;
     let _valorIni = valorIni;
     let _valorFin = valorFin;
     let _cuadros = cuadrosDuracion === undefined ? 0 : cuadrosDuracion;
@@ -59,6 +59,7 @@ function Variador(S, valorIni, valorFin, cuadrosDuracion, cuadrosRetardo) {
     }
     
     function completado() {
+        valor(); // Es necesario chequear el valor para ver si se completó
         return _completado;
     }
     
